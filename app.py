@@ -1173,33 +1173,7 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         else:
             target_uid = None
             for u_id, u_name in GROUP_USER_NAMES.get(tid, {}).items():
-                if u_name.lower() == target_u:
-                    target_uid = u_id
-                    break
-            if not target_uid:
-                try:
-                    u_info = cl.user_info_by_username(target_u)
-                    target_uid = str(u_info.pk)
-                except Exception:
-                    target_uid = None
-
-            if target_uid:
-                if add_user_back_to_group(cl, tid, target_uid):
-                    welcome_ai = generate_gemini_reply(f"New member @{target_u} joined! Welcome @{target_u} in 1 friendly Hinglish line.")
-                    reply_msg = welcome_ai if welcome_ai else f"✅ Done Boss! @{target_u} ko group mein add kar liya gaya hai! 🎉"
-                else:
-                    reply_msg = f"⚠️ @{target_u} ko add nahi kar paaya (Privacy setting ya follow issue ho sakta hai)."
-            else:
-                reply_msg = f"❌ Instagram par @{target_u} naam ka user nahi mila!"
-
-    if reply_msg:
-        send_reply_fast(cl, tid, mid, reply_msg)
-        BOT_STATUS["last_reply_sent"] = reply_msg
-        return True
-
-    return False
-
-def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False):
+                if u_nadef handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False):
     cmd_text = text.strip()
     low_cmd = cmd_text.lower()
 
@@ -1235,15 +1209,13 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
             "Share 2 interesting trending desi news headlines in 2 short Hinglish lines with full swag! Do not mention owner."
         )
 
-        if reply_msg:
+    if reply_msg:
         send_reply_fast(cl, tid, mid, reply_msg)
         BOT_STATUS["last_reply_sent"] = reply_msg
         return True
 
     return False
 
-
-RAW_WRAPPER_READY = True
 
 class RawObj:
     def __init__(self, d):
@@ -1252,6 +1224,33 @@ class RawObj:
             setattr(self, k, v)
     def dict(self):
         return self._d
+me.lower() == target_u:
+                    target_uid = u_id
+                    break
+            if not target_uid:
+                try:
+                    u_info = cl.user_info_by_username(target_u)
+                    target_uid = str(u_info.pk)
+                except Exception:
+                    target_uid = None
+
+            if target_uid:
+                if add_user_back_to_group(cl, tid, target_uid):
+                    welcome_ai = generate_gemini_reply(f"New member @{target_u} joined! Welcome @{target_u} in 1 friendly Hinglish line.")
+                    reply_msg = welcome_ai if welcome_ai else f"✅ Done Boss! @{target_u} ko group mein add kar liya gaya hai! 🎉"
+                else:
+                    reply_msg = f"⚠️ @{target_u} ko add nahi kar paaya (Privacy setting ya follow issue ho sakta hai)."
+            else:
+                reply_msg = f"❌ Instagram par @{target_u} naam ka user nahi mila!"
+
+    if reply_msg:
+        send_reply_fast(cl, tid, mid, reply_msg)
+        BOT_STATUS["last_reply_sent"] = reply_msg
+        return True
+
+    return False
+
+
 
 def login_instagram_bulletproof(cl, raw_session_id):
     clean_sid = unquote(raw_session_id).strip()
