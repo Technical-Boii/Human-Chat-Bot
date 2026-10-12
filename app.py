@@ -1235,13 +1235,17 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
             "Share 2 interesting trending desi news headlines in 2 short Hinglish lines with full swag! Do not mention owner."
         )
 
-    if reply_msg:
+        if reply_msg:
         send_reply_fast(cl, tid, mid, reply_msg)
         BOT_STATUS["last_reply_sent"] = reply_msg
         return True
 
     return False
-        class RawObj:
+
+
+RAW_WRAPPER_READY = True
+
+class RawObj:
     def __init__(self, d):
         self._d = d if isinstance(d, dict) else {}
         for k, v in self._d.items():
