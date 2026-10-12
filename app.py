@@ -1673,7 +1673,7 @@ def run_main_bot_polling_loop(
                             bot_own_replies.add(text)
                             continue
 
-                                        media_b64, media_mime, media_label = extract_media_for_gemini(msg)
+                    media_b64, media_mime, media_label = extract_media_for_gemini(msg)
                     if not text and not media_b64:
                         continue
 
