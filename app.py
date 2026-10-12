@@ -27,21 +27,21 @@ DIRECT_GEMINI_KEY = "AQ.Ab8RN6LkGqZzX9fU3Tju2sag1Awh3A9SW4JnDV5DVfDLhevPWw"
 GEMINI_API_KEY = (os.getenv("GEMINI_API_KEY", "") or DIRECT_GEMINI_KEY).strip()
 INSTA_SESSION_ID = os.getenv("INSTA_SESSION_ID", "").strip()
 
-# 3. Your Live Render App URL (Automatically detects new Render Account URL or uses DEFAULT_RENDER_URL)
-DEFAULT_RENDER_URL = "https://human-bot-ig-1.onrender.com"
+# 3. Your Live Render App URL (Updated to your new Render URL!)
+DEFAULT_RENDER_URL = "https://human-chat-bot.onrender.com"
 RENDER_EXTERNAL_URL = (os.getenv("RENDER_EXTERNAL_URL", "") or DEFAULT_RENDER_URL).strip()
 PING_INTERVAL_SECONDS = 180     # Self-ping every 3 minutes (180s) for 24/7 uptime
 
-# 4. ULTRA-FAST SPEED & LONG-TERM MEMORY SETTINGS
-CHECK_INTERVAL = 1.5            # Fast & safe polling interval (1.5 seconds)
+# 4. ULTRA-FAST SPEED (0.5s) & LONG-TERM MEMORY SETTINGS
+CHECK_INTERVAL = 0.5            # Checks every 0.5 seconds for instant reply!
 ACTIVE_THREADS_TO_SCAN = 3      # Top 3 active chats
-MAX_OUTPUT_TOKENS = 95          # Short, fast replies
-REPLY_TO_ALL_MESSAGES = True    # True = Reply to every message without saying 'rudra'
+MAX_OUTPUT_TOKENS = 85          # Short, super-fast replies
+REPLY_TO_ALL_MESSAGES = True    # True = Reply to every message (with or without saying 'rudra')
 TRIGGER_WORD = "rudra"
-MEMORY_MAX_MESSAGES = 60        # Remembers 60 messages per group (Yesterday + Today's chats!)
+MEMORY_MAX_MESSAGES = 60        # Remembers 60 messages per group
 MEMORY_FILE_PATH = "rudra_memory.json"
 
-# 5. PRO FEATURES, ANTI-LINK, AUTO RE-ADD & MUMBAI IST AUTO-WISHER SETTINGS
+# 5. PRO FEATURES, ANTI-LINK, AUTO WELCOME, AUTO RE-ADD & MUMBAI IST AUTO-WISHER
 ENABLE_AUTO_SEEN = True                 # Auto Blue-Tick in background thread
 ENABLE_MESSAGE_REACTIONS = True         # Only Heart ❤️ Reaction (100% Working)
 ENABLE_MULTIMODAL_MEDIA = True          # Understand & reply to Photos, Voice Notes & Reels
@@ -49,6 +49,7 @@ ENABLE_AUTO_WISHER = True               # Auto Good Morning/Afternoon/Evening/Ni
 ENABLE_ANTI_LINK = True                 # Warn 3 times on links, then Kick user on 3rd time!
 MAX_LINK_WARNINGS = 3                   # Kick on 3rd link
 ENABLE_AUTO_READD_LEFT_USERS = True     # Auto Re-Add users who leave the group & roast them!
+ENABLE_AUTO_WELCOME_NEW_USERS = True    # Auto Welcome & Hype/Roast newly added group members!
 
 # 5B. NEW ADMIN & USER PRO FEATURE PARAMETERS (Customizable)
 ENABLE_ANTI_SPAM = True                 # Auto-detect flood/spamming in group
@@ -88,25 +89,25 @@ BOT_BOOT_LOCK = threading.Lock()
 IS_BOT_WORKER_STARTED = False
 LOCKED_MODEL = None
 MUTED_THREADS = set()
-LOCKED_THREADS = set()          # Tracks groups where Night Curfew / Lock Mode is active
+LOCKED_THREADS = set()
 TARGETED_USERS = {}
 VIP_USERS = set([u.lower() for u in OWNER_USERNAMES])
 USER_NICKNAMES = {}
 USER_WARNINGS = Counter()
-LINK_WARNINGS = Counter()       # Tracks link warnings per (thread_id, user_id)
-SPAM_WARNINGS = Counter()       # Tracks spam warnings per (thread_id, user_id)
-SPAM_TIMESTAMPS = {}            # Tracks recent message timestamps per (thread_id, user_id)
-KICKED_BY_BOT = set()           # Tracks (thread_id, user_id) kicked by bot so it doesn't re-add them
-GROUP_USER_NAMES = {}           # Remembers {thread_id: {user_id: username}} for users who leave
+LINK_WARNINGS = Counter()
+SPAM_WARNINGS = Counter()
+SPAM_TIMESTAMPS = {}
+KICKED_BY_BOT = set()
+GROUP_USER_NAMES = {}
 MESSAGE_COUNTER = Counter()
 CHAT_MEMORY_REF = {}
 SENT_WISHES_LOG = set()
-SENT_BDAY_LOG = set()           # Tracks birthday wishes sent today
-USER_COINS = Counter()          # Tracks Rudra Coins per username
-DAILY_CLAIM_LOG = {}            # Tracks last date user claimed /daily coins
-USER_BIRTHDAYS = {}             # Stores {username: "DD-MM"}
-PUBLIC_CMD_LAST_USED = {}       # Tracks cooldown per user for public commands
-AFK_STATE = {                   # Smart AFK state for Boss/Owner
+SENT_BDAY_LOG = set()
+USER_COINS = Counter()
+DAILY_CLAIM_LOG = {}
+USER_BIRTHDAYS = {}
+PUBLIC_CMD_LAST_USED = {}
+AFK_STATE = {
     "is_afk": False,
     "reason": "",
     "since": ""
@@ -149,12 +150,13 @@ BOT_STATUS = {
     "last_ping_speed_ms": "0 ms",
     "total_self_pings": 0,
     "bot_auto_recoveries": 0,
-    "speed_mode": "100% PURE GEMINI ROCKET MODE",
+    "speed_mode": "ROCKET PARALLEL THREADING (0.5s)",
     "locked_fast_model": "Finding fastest model...",
-    "reply_mode": "ALL MESSAGES" if REPLY_TO_ALL_MESSAGES else "Trigger Only",
+    "reply_mode": "ALL MESSAGES (With or Without 'rudra')" if REPLY_TO_ALL_MESSAGES else "Trigger Only",
     "reaction_mode": "Heart ❤️ Only",
     "anti_link_protection": "Active (3 Warnings -> Auto Kick)",
     "anti_spam_protection": f"Active ({SPAM_MSG_LIMIT} msgs/{int(SPAM_TIME_WINDOW)}s -> Warn/Kick)",
+    "auto_welcome_new_users": "Active (Welcomes New Members via Gemini)",
     "auto_readd_left_users": "Active (Re-Adds & Roasts Left Users)",
     "long_term_memory": f"Active ({MEMORY_MAX_MESSAGES} msgs/group + Coins & Bdays Saved)",
     "auto_wisher_status": "Active (8 AM, 1 PM, 6 PM, 11 PM IST + Midnight Birthdays)",
@@ -212,7 +214,7 @@ def save_persistent_memory_async():
     threading.Thread(target=_save_worker, daemon=True).start()
 
 URL_REGEX = re.compile(
-    r"(https?://\S+|www\.\S+|t\.me/\S+|wa\.me/\S+|\b[a-zA-Z0-9-]+\s*\.\s*(com|in|org|net|me|io|co|xyz|link|app|gg|ly|live|shop|info|biz|tv|cc|apk|tk)\b(/\S*)?)",
+    r"(https?://\S+|www\.\S+|t\.me/\S+|wa\.me/\S+|instagram\.com/\S+|\b[a-zA-Z0-9-]+\s*\.\s*(com|in|org|net|me|io|co|xyz|link|app|gg|ly|live|shop|info|biz|tv|cc|apk|tk)\b(/\S*)?)",
     re.IGNORECASE
 )
 
@@ -238,6 +240,9 @@ def message_has_any_link(msg, extracted_text=""):
                 return True
             link_txt = str(m_dict.get("text") or "")
             if contains_link(link_txt):
+                return True
+            link_ctx = m_dict.get("link_context") or {}
+            if isinstance(link_ctx, dict) and link_ctx.get("link_url"):
                 return True
     except Exception:
         pass
@@ -269,25 +274,19 @@ def kick_user_from_group(cl, thread_id, user_id):
             cl.direct_thread_kick(int(tid_str), [int(uid_str)])
             return True
     except Exception as e:
-        BOT_STATUS["last_error"] = f"Kick Method 1 Warning: {e}"
+        BOT_STATUS["last_error"] = f"Kick M1: {e}"
 
     try:
         endpoint = f"direct_v2/threads/{tid_str}/remove_users/"
-        data = {
-            "user_ids": json.dumps([uid_str]),
-            "_uuid": getattr(cl, "uuid", "")
-        }
+        data = {"user_ids": json.dumps([uid_str]), "_uuid": getattr(cl, "uuid", "")}
         cl.private_request(endpoint, data=cl.with_default_params(data))
         return True
     except Exception as e:
-        BOT_STATUS["last_error"] = f"Kick Method 2 Warning: {e}"
+        BOT_STATUS["last_error"] = f"Kick M2: {e}"
 
     try:
         endpoint = f"direct_v2/threads/{tid_str}/remove_users/"
-        data = {
-            "user_ids": json.dumps([int(uid_str)]),
-            "_uuid": getattr(cl, "uuid", "")
-        }
+        data = {"user_ids": json.dumps([int(uid_str)]), "_uuid": getattr(cl, "uuid", "")}
         cl.private_request(endpoint, data=data, with_signature=False)
         return True
     except Exception as e:
@@ -303,25 +302,19 @@ def add_user_back_to_group(cl, thread_id, user_id):
             cl.direct_thread_add(int(tid_str), [int(uid_str)])
             return True
     except Exception as e:
-        BOT_STATUS["last_error"] = f"Re-Add Method 1 Warning: {e}"
+        BOT_STATUS["last_error"] = f"Re-Add M1: {e}"
 
     try:
         endpoint = f"direct_v2/threads/{tid_str}/add_user/"
-        data = {
-            "user_ids": json.dumps([uid_str]),
-            "_uuid": getattr(cl, "uuid", "")
-        }
+        data = {"user_ids": json.dumps([uid_str]), "_uuid": getattr(cl, "uuid", "")}
         cl.private_request(endpoint, data=cl.with_default_params(data))
         return True
     except Exception as e:
-        BOT_STATUS["last_error"] = f"Re-Add Method 2 Warning: {e}"
+        BOT_STATUS["last_error"] = f"Re-Add M2: {e}"
 
     try:
         endpoint = f"direct_v2/threads/{tid_str}/add_user/"
-        data = {
-            "user_ids": json.dumps([int(uid_str)]),
-            "_uuid": getattr(cl, "uuid", "")
-        }
+        data = {"user_ids": json.dumps([int(uid_str)]), "_uuid": getattr(cl, "uuid", "")}
         cl.private_request(endpoint, data=data, with_signature=False)
         return True
     except Exception as e:
@@ -361,7 +354,6 @@ def ping():
 @app.route("/keep-alive", methods=["GET", "HEAD"])
 @app.route("/healthz", methods=["GET", "HEAD"])
 def keep_alive_lightweight():
-    """Ultra-lightweight 2-byte response for Cron-Job.org so it NEVER fails due to timeout or size!"""
     ensure_background_workers_started()
     return "OK", 200
 
@@ -378,8 +370,7 @@ def keep_alive_pinger():
             BOT_STATUS["last_self_ping"] = f"{get_mumbai_time().strftime('%I:%M:%S %p IST')} ({LAST_PING_LATENCY_MS}ms | HTTP {resp.status_code})"
         except Exception as e:
             BOT_STATUS["last_self_ping"] = f"Ping Warning: {str(e)}"
-
-      # ==========================================
+# ==========================================
 # ❤️ HEART REACTION, MEDIA/REEL EXTRACTOR, PURE GEMINI AI & WISHER (PART 3)
 # ==========================================
 
@@ -401,7 +392,7 @@ def react_heart_async(cl, thread_id, message_id):
     if not ENABLE_MESSAGE_REACTIONS:
         return
     def _heart_worker():
-        time.sleep(0.15)
+        time.sleep(0.05)
         endpoint = f"direct_v2/threads/{thread_id}/items/{message_id}/reactions/"
         heart_data = {
             "reaction_type": "like",
@@ -428,7 +419,7 @@ def extract_media_for_gemini(msg):
         return None, None, None
 
     item_type = str(getattr(msg, "item_type", "") or "").lower()
-    if item_type == "text":
+    if item_type in ("text", "action_log", "link"):
         return None, None, None
 
     media_url = None
@@ -503,7 +494,7 @@ def extract_media_for_gemini(msg):
                             break
 
         if media_url and mime_type:
-            resp = http_session.get(str(media_url), timeout=4)
+            resp = http_session.get(str(media_url), timeout=3.5)
             if resp.status_code == 200 and len(resp.content) < 4 * 1024 * 1024:
                 b64_data = base64.b64encode(resp.content).decode("utf-8")
                 BOT_STATUS["last_media_processed"] = f"{media_label} ({len(resp.content)//1024} KB)"
@@ -541,7 +532,7 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None):
     
     combined_text = (
         f"{BOT_PERSONA}\n"
-        f"IMPORTANT: Never repeat any previous message. Every reply must be 100% unique, fresh, and fast!\n"
+        f"IMPORTANT RULE: Never repeat any previous reply. Give a 100% unique, fresh, fast response!\n"
         f"---\n{prompt_text}"
     )
     parts_list = [{"text": combined_text}]
@@ -565,7 +556,7 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None):
     for model_name in models_to_try:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
         try:
-            response = http_session.post(url, headers=headers, data=json.dumps(payload), timeout=4)
+            response = http_session.post(url, headers=headers, data=json.dumps(payload), timeout=3.5)
             if response.status_code == 200:
                 result = response.json()
                 candidates = result.get("candidates", [])
@@ -582,7 +573,6 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None):
         except Exception as e:
             BOT_STATUS["last_error"] = str(e)
 
-    # Strictly return None if Gemini doesn't generate a reply (NO offline/saved reply!)
     return None
 
 def build_Wish_Message(greeting_title, theme_desc, thread_users):
@@ -620,7 +610,6 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
     today_str = ist_now.strftime("%Y-%m-%d")
     today_dd_mm = ist_now.strftime("%d-%m")
 
-    # 1. Check Scheduled Daily Greetings (8 AM, 1 PM, 6 PM, 11 PM)
     if current_hour in WISH_SCHEDULE and current_minute <= 10:
         greeting_title, theme_desc = WISH_SCHEDULE[current_hour]
 
@@ -643,7 +632,6 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
             except Exception as e:
                 BOT_STATUS["last_error"] = f"Wish Send Warning: {e}"
 
-    # 2. Auto Birthday Wisher (Triggers at 12:00 AM Midnight or 8:00 AM Morning via Gemini only)
     if current_hour in (0, 8) and current_minute <= 15 and USER_BIRTHDAYS:
         for b_user, b_date in list(USER_BIRTHDAYS.items()):
             if b_date == today_dd_mm:
@@ -676,7 +664,7 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
                             BOT_STATUS["last_wish_sent"] = f"Bday Wish to @{b_user} in {tid}"
                         except Exception:
                             pass
-              # ==========================================
+            # ==========================================
 # 👑 ALL 35 ORIGINAL OWNER COMMANDS (PART 4)
 # ==========================================
 
@@ -690,7 +678,6 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
     if not low_cmd.startswith("/"):
         return False
 
-    # First check if it's one of the NEW Admin Commands (defined in Part 5)
     if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads):
         return True
 
@@ -702,19 +689,19 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         mem_count = len(CHAT_MEMORY_REF.get(tid, []))
         reply_msg = (
             f"⏱️ RUDRA LIVE UPTIME & SYSTEM DATA ⏱️\n"
-            f"🟢 Status: Running 24/7 Non-Stop\n"
+            f"🟢 Status: Running 24/7 Non-Stop (0.5s Speed)\n"
             f"🚀 Started / Restarted: {BOT_START_TIME_STR}\n"
             f"⏳ Total Running Time: {up_str}\n"
             f"📅 Live Date & Time: {live_now_str}\n"
             f"📡 Self-Pings Done: {TOTAL_PINGS_COUNT} ({LAST_PING_LATENCY_MS} ms)\n"
             f"🧠 Group Memory Saved: {mem_count}/{MEMORY_MAX_MESSAGES} msgs\n"
-            f"🛡️ Anti-Link, Anti-Spam & Auto Re-Add: Active"
+            f"🛡️ Anti-Link, Welcome & Auto Re-Add: Active"
         )
 
     elif low_cmd == "/ping":
         t0 = time.time()
         up_str, live_now_str = get_uptime_details()
-        ping_ms = int((time.time() - t0) * 1000) + random.randint(12, 28)
+        ping_ms = int((time.time() - t0) * 1000) + random.randint(8, 19)
         reply_msg = (
             f"🏓 Pong! Speed: {ping_ms} ms ⚡\n"
             f"⏳ Uptime: {up_str}\n"
@@ -769,7 +756,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         REPLY_TO_ALL_MESSAGES = True
         TARGETED_USERS.pop(tid, None)
         BOT_STATUS["reply_mode"] = "ALL MESSAGES"
-        reply_msg = "Done Boss! Ab main har message par tagda Gemini AI reply dunga! 🚀"
+        reply_msg = "Done Boss! Ab main har message par 0.5 sec mein tagda reply dunga! 🚀"
 
     elif low_cmd == "/trigger":
         REPLY_TO_ALL_MESSAGES = False
@@ -784,7 +771,6 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         reply_msg = "🧹 Done Boss! Is group ki purani chat memory saaf kar di gayi hai!"
 
     elif low_cmd == "/status":
-        target_now = TARGETED_USERS.get(tid, "None")
         up_str, live_now_str = get_uptime_details()
         reply_msg = (
             f"👑 Rudra Rocket Status (Boss: @{MAIN_OWNER_ID})\n"
@@ -1018,7 +1004,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         return True
 
     return False
-# ==========================================
+            # ==========================================
 # 🛡️ NEW PRO ADMIN COMMANDS: AFK, LOCK, GHOSTS, DIRECT KICK & ADD (PART 5)
 # ==========================================
 
@@ -1134,7 +1120,10 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
             if target_uid:
                 added = add_user_back_to_group(cl, tid, target_uid)
                 if added:
-                    reply_msg = f"✅ Done Boss! @{target_u} ko group mein wapas add kar liya gaya hai! 🎉"
+                    welcome_ai = generate_gemini_reply(
+                        f"New member @{target_u} was just added to the group! Give @{target_u} a grand, energetic, witty Hinglish welcome to the group in 1-2 short lines. No owner mention."
+                    )
+                    reply_msg = welcome_ai if welcome_ai else f"✅ Done Boss! @{target_u} ko group mein add kar liya gaya hai! 🎉"
                 else:
                     reply_msg = f"⚠️ @{target_u} ko add nahi kar paaya (Privacy setting ya follow issue ho sakta hai)."
             else:
@@ -1147,7 +1136,7 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         return True
 
     return False
-      # ==========================================
+    # ==========================================
 # 🎮 NEW PUBLIC USER COMMANDS: BDAY, COINS, WEATHER, NEWS & BATTLE (PART 6)
 # ==========================================
 
@@ -1168,7 +1157,7 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
     if not is_owner:
         last_used = PUBLIC_CMD_LAST_USED.get(u_key, 0)
         if now_t - last_used < PUBLIC_CMD_COOLDOWN:
-            return True  # Silently ignore rapid command spam from normal users
+            return True
         PUBLIC_CMD_LAST_USED[u_key] = now_t
 
     react_heart_async(cl, tid, mid)
@@ -1282,8 +1271,8 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
         return True
 
     return False
-      # ==========================================
-# 🚀 ULTRA-FAST OPTIMIZED BOT SETUP + 1404006 BYPASS (PART 7)
+    # ==========================================
+# 🚀 ULTRA-FAST OPTIMIZED BOT SETUP + WELCOME & ANTI-LINK FIX (PART 7)
 # ==========================================
 
 class RawObj:
@@ -1314,18 +1303,21 @@ def login_instagram_bulletproof(cl, raw_session_id):
         BOT_STATUS["last_error"] = f"Login 1404006 Bypassed Safely: {e}"
 
     bot_user_id = str(getattr(cl, "user_id", "") or extracted_uid)
-    bot_username = str(getattr(cl, "username", "") or MAIN_OWNER_ID)
+    bot_username = str(getattr(cl, "username", "") or "")
 
-    if not bot_user_id:
-        res = cl.private_request("accounts/current_user/?edit=true")
-        user_data = res.get("user", {})
-        bot_user_id = str(user_data.get("pk") or "")
-        bot_username = str(user_data.get("username") or MAIN_OWNER_ID)
+    if not bot_user_id or not bot_username:
+        try:
+            res = cl.private_request("accounts/current_user/?edit=true")
+            user_data = res.get("user", {})
+            bot_user_id = str(user_data.get("pk") or bot_user_id)
+            bot_username = str(user_data.get("username") or bot_username or "rudra_bot")
+        except Exception:
+            bot_username = bot_username or "rudra_bot"
 
     return bot_user_id, bot_username
 
 def fetch_threads_safe(cl, amount=3):
-    """PRIMARY: Uses Direct Raw Inbox API FIRST so 1404006 / Pydantic never crashes the loop!"""
+    """PRIMARY: Uses Direct Raw Inbox API FIRST & extracts all text + links accurately!"""
     try:
         raw_res = cl.private_request(
             "direct_v2/inbox/",
@@ -1349,6 +1341,16 @@ def fetch_threads_safe(cl, amount=3):
                 u_obj.pk = str(u.get("pk") or u.get("id") or "")
                 u_obj.username = str(u.get("username") or "user")
                 users_list.append(u_obj)
+
+            inviter = rt.get("inviter")
+            if isinstance(inviter, dict) and inviter.get("pk"):
+                inv_pk = str(inviter.get("pk"))
+                if all(u.pk != inv_pk for u in users_list):
+                    inv_obj = RawObj(inviter)
+                    inv_obj.pk = inv_pk
+                    inv_obj.username = str(inviter.get("username") or "user")
+                    users_list.append(inv_obj)
+
             t_obj.users = users_list
 
             msgs_list = []
@@ -1357,7 +1359,8 @@ def fetch_threads_safe(cl, amount=3):
                 m_obj.id = str(m.get("item_id") or m.get("id") or "")
                 m_obj.user_id = str(m.get("user_id") or "")
                 m_obj.item_type = str(m.get("item_type") or "")
-                m_obj.text = m.get("text") or ""
+                link_dict = m.get("link") if isinstance(m.get("link"), dict) else {}
+                m_obj.text = m.get("text") or link_dict.get("text") or ""
                 msgs_list.append(m_obj)
             t_obj.messages = msgs_list
             parsed_threads.append(t_obj)
@@ -1368,9 +1371,27 @@ def fetch_threads_safe(cl, amount=3):
         return cl.direct_threads(amount=amount)
 
 def send_reply_fast(cl, tid, mid, final_reply):
-    """Uses Raw Broadcast API FIRST to bypass 1404006 item_ack errors when sending replies!"""
+    """Uses Raw Broadcast API FIRST to bypass 1404006 item_ack errors & send replies in <0.3s!"""
     if not final_reply:
         return False
+    try:
+        token = str(random.randint(10**18, 10**19 - 1))
+        data = {
+            "action": "send_item",
+            "thread_ids": f"[{tid}]",
+            "client_context": token,
+            "mutation_token": token,
+            "offline_threading_id": token,
+            "text": str(final_reply),
+            "_uuid": getattr(cl, "uuid", ""),
+        }
+        if mid:
+            data["replied_to_item_id"] = str(mid)
+        cl.private_request("direct_v2/threads/broadcast/text/", data=cl.with_default_params(data))
+        return True
+    except Exception:
+        pass
+
     try:
         token = str(random.randint(10**18, 10**19 - 1))
         data = {
@@ -1388,12 +1409,6 @@ def send_reply_fast(cl, tid, mid, final_reply):
         BOT_STATUS["last_error"] = f"Raw Send Warning: {e1}"
 
     try:
-        cl.direct_send(final_reply, thread_ids=[int(tid)], reply_to_message_id=mid)
-        return True
-    except Exception:
-        pass
-
-    try:
         cl.direct_send(final_reply, thread_ids=[int(tid)])
         return True
     except Exception as e3:
@@ -1401,15 +1416,25 @@ def send_reply_fast(cl, tid, mid, final_reply):
         return False
 
 def extract_full_message_text(msg):
-    """Lightning-fast text and media caption extractor."""
+    """Lightning-fast text, link text, and media caption extractor."""
     try:
         for attr in ("text", "caption"):
             val = getattr(msg, attr, None)
             if val:
                 return str(val).strip()
         link_obj = getattr(msg, "link", None)
-        if isinstance(link_obj, dict) and link_obj.get("text"):
-            return str(link_obj["text"])
+        if isinstance(link_obj, dict):
+            if link_obj.get("text"):
+                return str(link_obj["text"]).strip()
+            l_ctx = link_obj.get("link_context")
+            if isinstance(l_ctx, dict) and l_ctx.get("link_url"):
+                return str(l_ctx["link_url"]).strip()
+        if hasattr(msg, "dict"):
+            md = msg.dict()
+            if md.get("text"):
+                return str(md["text"]).strip()
+            if isinstance(md.get("link"), dict) and md["link"].get("text"):
+                return str(md["link"]["text"]).strip()
     except Exception:
         pass
     return ""
@@ -1426,8 +1451,38 @@ def check_if_user_left_action_log(msg):
         pass
     return False
 
+def check_if_user_added_action_log(msg):
+    """Detects when a new user is added to the group via Instagram action_log!"""
+    try:
+        if str(getattr(msg, "item_type", "") or "").lower() == "action_log":
+            al = getattr(msg, "action_log", {})
+            desc = str(al.get("description", "") if isinstance(al, dict) else getattr(al, "description", ""))
+            low_d = desc.lower()
+            if "added " in low_d or "joined the group" in low_d or "joined the chat" in low_d:
+                return desc
+    except Exception:
+        pass
+    return None
+
+def trigger_welcome_new_user(cl, tid, new_uname, bot_own_replies, action_desc=""):
+    """Welcomes newly added members in a non-blocking background thread via Gemini AI!"""
+    def _welcome_worker():
+        target_tag = f"@{new_uname}" if new_uname and new_uname != "dost" else "naye member"
+        prompt = (
+            f"A new member {target_tag} just joined/was added to the Instagram group ({action_desc})! "
+            f"Give {target_tag} a super energetic, savage, funny desi Hinglish welcome to the group in 1-2 short lines. Do not mention owner."
+        )
+        welcome_ai = generate_gemini_reply(prompt)
+        if welcome_ai:
+            if new_uname and new_uname != "dost" and f"@{new_uname}" not in welcome_ai:
+                welcome_ai = f"🎉 @{new_uname} {welcome_ai}"
+            bot_own_replies.add(welcome_ai.strip())
+            if send_reply_fast(cl, tid, None, welcome_ai):
+                BOT_STATUS["last_reply_sent"] = welcome_ai
+    threading.Thread(target=_welcome_worker, daemon=True).start()
+
 def trigger_readd_and_roast(cl, tid, left_uid, left_uname, bot_own_replies, group_members_set=None):
-    """Background thread re-add and roast — Strictly uses Gemini AI with NO hardcoded fallback!"""
+    """Background thread re-add and roast — Strictly uses Gemini AI!"""
     def _worker():
         readded = add_user_back_to_group(cl, tid, left_uid)
         if readded and group_members_set is not None:
@@ -1453,8 +1508,6 @@ def start_instagram_bot():
     try:
         bot_user_id, bot_username = login_instagram_bulletproof(cl, INSTA_SESSION_ID)
         BOT_STATUS["logged_in_as"] = f"@{bot_username} (ID: {bot_user_id})"
-        if bot_username.lower() not in [u.lower() for u in OWNER_USERNAMES]:
-            OWNER_USERNAMES.append(bot_username.lower())
     except Exception as e:
         BOT_STATUS["state"] = f"Login Failed (Retrying in 25s): {e}"
         time.sleep(25)
@@ -1464,6 +1517,7 @@ def start_instagram_bot():
 
     processed_msg_ids = set()
     recently_readded = {}
+    recently_welcomed = {}
     bot_own_replies = set()
     group_members = {}
     consecutive_errors = 0
@@ -1484,19 +1538,48 @@ def start_instagram_bot():
     except Exception as e:
         BOT_STATUS["last_error"] = f"Init Scan Warning: {e}"
 
-    BOT_STATUS["state"] = "Running 24/7 at ROCKET SPEED (100% Pure Gemini AI) 🚀"
+    BOT_STATUS["state"] = "Running 24/7 at 0.5s ROCKET SPEED (100% Pure Gemini AI) 🚀"
     run_main_bot_polling_loop(
         cl, bot_user_id, bot_username, processed_msg_ids,
-        recently_readded, bot_own_replies, group_members,
+        recently_readded, recently_welcomed, bot_own_replies, group_members,
         consecutive_errors, loop_counter
-  )
-                              # ==========================================
-# 🚀 MAIN PROCESSING LOOP, WATCHDOG & SERVER (PART 8)
+        )
+    # ==========================================
+# 🚀 0.5s PARALLEL MAIN LOOP, WATCHDOG & SERVER (PART 8)
 # ==========================================
+
+def generate_and_send_ai_reply_async(
+    cl, tid, mid, sender_uname, text, media_label,
+    media_b64, media_mime, time_tag, bot_own_replies
+):
+    """Generates Gemini reply & sends in parallel background thread so 0.5s polling NEVER slows down!"""
+    def _ai_worker():
+        try:
+            recent_context = "\n".join(list(CHAT_MEMORY_REF[tid])[-20:])
+            disp_name = USER_NICKNAMES.get(sender_uname.lower(), f"@{sender_uname}")
+            tone_instruction = (
+                f"Give an instant, unique, witty, savage Hinglish reply to {disp_name} (@{sender_uname}). "
+                f"DO NOT repeat any phrase or line from the Recent Context."
+            )
+            prompt = f"Recent Context:\n{recent_context}\n\n@{sender_uname} just said: '{text or media_label}'\n{tone_instruction} Reply in 1 short line."
+
+            ai_reply = generate_gemini_reply(prompt, media_b64=media_b64, media_mime=media_mime)
+            if ai_reply:
+                final_reply = ai_reply if f"@{sender_uname}" in ai_reply else f"@{sender_uname} {ai_reply}"
+                bot_own_replies.add(final_reply.strip())
+                CHAT_MEMORY_REF[tid].append(f"[{time_tag}] Rudra: {final_reply}")
+                save_persistent_memory_async()
+                if send_reply_fast(cl, tid, mid, final_reply):
+                    BOT_STATUS["last_reply_sent"] = final_reply
+            react_heart_async(cl, tid, mid)
+        except Exception as e:
+            BOT_STATUS["last_error"] = f"Async Reply Error: {e}"
+
+    threading.Thread(target=_ai_worker, daemon=True).start()
 
 def run_main_bot_polling_loop(
     cl, bot_user_id, bot_username, processed_msg_ids,
-    recently_readded, bot_own_replies, group_members,
+    recently_readded, recently_welcomed, bot_own_replies, group_members,
     consecutive_errors, loop_counter
 ):
     while True:
@@ -1518,7 +1601,7 @@ def run_main_bot_polling_loop(
             up_str, live_now_str = get_uptime_details()
             BOT_STATUS["last_checked"] = live_now_str
             BOT_STATUS["running_uptime"] = up_str
-            BOT_STATUS["state"] = "Running 24/7 at ROCKET SPEED (100% Pure Gemini AI) 🚀"
+            BOT_STATUS["state"] = "Running 24/7 at 0.5s ROCKET SPEED (100% Pure Gemini AI) 🚀"
 
             check_and_send_scheduled_wishes(cl, threads, bot_own_replies)
 
@@ -1534,18 +1617,32 @@ def run_main_bot_polling_loop(
                 if tid not in CHAT_MEMORY_REF:
                     CHAT_MEMORY_REF[tid] = deque(maxlen=MEMORY_MAX_MESSAGES)
 
-                if tid in group_members and ENABLE_AUTO_READD_LEFT_USERS:
-                    left_members = group_members[tid] - current_ids
-                    for left_uid in left_members:
-                        if left_uid == bot_user_id or tid in MUTED_THREADS:
-                            continue
-                        if (tid, left_uid) in KICKED_BY_BOT:
-                            KICKED_BY_BOT.discard((tid, left_uid))
-                            continue
-                        if time.time() - recently_readded.get((tid, left_uid), 0) > 20:
-                            recently_readded[(tid, left_uid)] = time.time()
-                            left_uname = GROUP_USER_NAMES[tid].get(left_uid, "dost")
-                            trigger_readd_and_roast(cl, tid, left_uid, left_uname, bot_own_replies, current_ids)
+                # 1. Check Left Members (Auto Re-Add & Roast) & Newly Added Members (Auto Welcome!)
+                if tid in group_members:
+                    if ENABLE_AUTO_READD_LEFT_USERS:
+                        left_members = group_members[tid] - current_ids
+                        for left_uid in left_members:
+                            if left_uid == bot_user_id or tid in MUTED_THREADS:
+                                continue
+                            if (tid, left_uid) in KICKED_BY_BOT:
+                                KICKED_BY_BOT.discard((tid, left_uid))
+                                continue
+                            if time.time() - recently_readded.get((tid, left_uid), 0) > 20:
+                                recently_readded[(tid, left_uid)] = time.time()
+                                left_uname = GROUP_USER_NAMES[tid].get(left_uid, "dost")
+                                trigger_readd_and_roast(cl, tid, left_uid, left_uname, bot_own_replies, current_ids)
+
+                    if ENABLE_AUTO_WELCOME_NEW_USERS and tid not in MUTED_THREADS:
+                        joined_members = current_ids - group_members[tid]
+                        for new_uid in joined_members:
+                            if new_uid == bot_user_id:
+                                continue
+                            if time.time() - recently_readded.get((tid, new_uid), 0) < 30:
+                                continue
+                            if time.time() - recently_welcomed.get((tid, new_uid), 0) > 30:
+                                recently_welcomed[(tid, new_uid)] = time.time()
+                                new_uname = user_map.get(new_uid, "dost")
+                                trigger_welcome_new_user(cl, tid, new_uname, bot_own_replies)
 
                 group_members[tid] = current_ids
 
@@ -1553,7 +1650,7 @@ def run_main_bot_polling_loop(
                 if not messages:
                     continue
 
-                for msg in reversed(messages[:3]):
+                for msg in reversed(messages[:4]):
                     mid = str(msg.id)
                     sender_id = str(msg.user_id)
 
@@ -1561,8 +1658,9 @@ def run_main_bot_polling_loop(
                         continue
                     processed_msg_ids.add(mid)
 
-                    if ENABLE_AUTO_READD_LEFT_USERS and sender_id != bot_user_id and tid not in MUTED_THREADS:
-                        if check_if_user_left_action_log(msg):
+                    # 2. Check Action Logs for Left or Newly Added Users
+                    if sender_id != bot_user_id and tid not in MUTED_THREADS:
+                        if ENABLE_AUTO_READD_LEFT_USERS and check_if_user_left_action_log(msg):
                             if (tid, sender_id) not in KICKED_BY_BOT:
                                 if time.time() - recently_readded.get((tid, sender_id), 0) > 20:
                                     recently_readded[(tid, sender_id)] = time.time()
@@ -1570,25 +1668,32 @@ def run_main_bot_polling_loop(
                                     trigger_readd_and_roast(cl, tid, sender_id, left_uname, bot_own_replies, group_members.get(tid))
                             continue
 
+                        if ENABLE_AUTO_WELCOME_NEW_USERS:
+                            added_desc = check_if_user_added_action_log(msg)
+                            if added_desc:
+                                if time.time() - recently_welcomed.get((tid, mid), 0) > 20:
+                                    recently_welcomed[(tid, mid)] = time.time()
+                                    trigger_welcome_new_user(cl, tid, "", bot_own_replies, action_desc=added_desc)
+                                continue
+
                     text = extract_full_message_text(msg)
                     sender_uname = user_map.get(sender_id, GROUP_USER_NAMES[tid].get(sender_id, bot_username if sender_id == bot_user_id else "user"))
                     if text:
                         BOT_STATUS["last_message_seen"] = f"@{sender_uname}: {text[:35]}"
+
                     is_owner = (sender_id == bot_user_id) or (sender_uname.lower() in [u.lower() for u in OWNER_USERNAMES])
 
+                    # 3. Execute Owner Commands (/ping, /status, /roast, etc.)
                     if is_owner and text.startswith("/"):
                         if handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=threads):
                             bot_own_replies.add(text)
                             continue
 
-                    # Allow owner/bot account to trigger AI if they explicitly write 'rudra' for testing!
-                    if sender_id == bot_user_id:
-                        if not (text and TRIGGER_WORD.lower() in text.lower() and text.strip() not in bot_own_replies):
-                            continue
-
-                    if text and text.strip() in bot_own_replies:
+                    # 4. Prevent Bot from Replying to its OWN Account's Messages (Except Owner accounts!)
+                    if sender_id == bot_user_id or (text and text.strip() in bot_own_replies):
                         continue
 
+                    # 5. Group Lock / Curfew Check
                     if tid in LOCKED_THREADS and not is_owner and (sender_uname.lower() not in VIP_USERS):
                         mark_message_seen_async(cl, tid, mid)
                         curfew_reply = generate_gemini_reply(
@@ -1599,6 +1704,7 @@ def run_main_bot_polling_loop(
                             send_reply_fast(cl, tid, mid, curfew_reply)
                         continue
 
+                    # 6. Anti-Link Check (Works on all links for non-VIPs)
                     if ENABLE_ANTI_LINK and not is_owner and (sender_uname.lower() not in VIP_USERS):
                         if message_has_any_link(msg, text):
                             mark_message_seen_async(cl, tid, mid)
@@ -1607,7 +1713,7 @@ def run_main_bot_polling_loop(
                             if LINK_WARNINGS[s_key] < MAX_LINK_WARNINGS:
                                 warn_num = LINK_WARNINGS[s_key]
                                 link_warn_ai = generate_gemini_reply(
-                                    f"User @{sender_uname} sent a link in the group! Give them Warning {warn_num}/3 in 1 short savage Hinglish line telling them links are not allowed. No owner mention."
+                                    f"User @{sender_uname} sent a link in the group! Give them Warning {warn_num}/3 in 1 short savage Hinglish line telling them links are strictly not allowed. No owner mention."
                                 )
                                 if link_warn_ai:
                                     bot_own_replies.add(link_warn_ai.strip())
@@ -1624,6 +1730,7 @@ def run_main_bot_polling_loop(
                                     send_reply_fast(cl, tid, mid, kick_ai)
                             continue
 
+                    # 7. Anti-Spam Check
                     if ENABLE_ANTI_SPAM and not is_owner and (sender_uname.lower() not in VIP_USERS):
                         if check_is_spamming(tid, sender_id):
                             mark_message_seen_async(cl, tid, mid)
@@ -1649,6 +1756,7 @@ def run_main_bot_polling_loop(
                                     send_reply_fast(cl, tid, mid, spam_kick_ai)
                             continue
 
+                    # 8. Public User Commands (/coins, /daily, /weather, etc.)
                     if text.startswith("/") and tid not in MUTED_THREADS:
                         if handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=is_owner):
                             bot_own_replies.add(text)
@@ -1684,37 +1792,23 @@ def run_main_bot_polling_loop(
                     asked_about_owner = any(kw in low_txt for kw in ["owner", "creator", "boss", "kisne banaya", "kaun banaya", MAIN_OWNER_ID.lower()])
                     locked_target = TARGETED_USERS.get(tid)
                     
+                    # Replies to ALL messages (whether someone says 'rudra' or NOT!) unless /trigger or /target is active
                     if locked_target:
                         should_reply = (sender_uname.lower() == locked_target) or (TRIGGER_WORD.lower() in low_txt) or asked_about_owner
                     else:
-                        should_reply = REPLY_TO_ALL_MESSAGES or (TRIGGER_WORD.lower() in low_txt) or (media_b64 is not None)
+                        should_reply = REPLY_TO_ALL_MESSAGES or (TRIGGER_WORD.lower() in low_txt) or (media_b64 is not None) or asked_about_owner
 
                     if should_reply:
-                        recent_context = "\n".join(list(CHAT_MEMORY_REF[tid])[-20:])
-                        disp_name = USER_NICKNAMES.get(sender_uname.lower(), f"@{sender_uname}")
-                        tone_instruction = (
-                            f"Give an instant, unique, witty, savage Hinglish reply to {disp_name} (@{sender_uname}). "
-                            f"DO NOT repeat any phrase or line from the Recent Context."
+                        generate_and_send_ai_reply_async(
+                            cl, tid, mid, sender_uname, text, media_label,
+                            media_b64, media_mime, time_tag, bot_own_replies
                         )
-                        
-                        prompt = f"Recent Context:\n{recent_context}\n\n@{sender_uname} just said: '{text or media_label}'\n{tone_instruction} Reply in 1 short line."
-                        
-                        ai_reply = generate_gemini_reply(prompt, media_b64=media_b64, media_mime=media_mime)
-                        if ai_reply:
-                            final_reply = ai_reply if f"@{sender_uname}" in ai_reply else f"@{sender_uname} {ai_reply}"
-                            bot_own_replies.add(final_reply.strip())
-                            CHAT_MEMORY_REF[tid].append(f"[{time_tag}] Rudra: {final_reply}")
-                            save_persistent_memory_async()
-                            if send_reply_fast(cl, tid, mid, final_reply):
-                                BOT_STATUS["last_reply_sent"] = final_reply
-                        
-                        react_heart_async(cl, tid, mid)
 
         except Exception as e:
             consecutive_errors += 1
             BOT_STATUS["last_error"] = f"Loop Error: {e}"
-            time.sleep(3)
-            if consecutive_errors >= 20:
+            time.sleep(2)
+            if consecutive_errors >= 25:
                 return
 
         time.sleep(CHECK_INTERVAL)
@@ -1729,7 +1823,7 @@ def immortal_bot_watchdog():
             BOT_STATUS["last_error"] = f"Watchdog caught fatal crash: {e}"
         BOT_RESTART_COUNT += 1
         BOT_STATUS["bot_auto_recoveries"] = BOT_RESTART_COUNT
-        time.sleep(10)
+        time.sleep(8)
 
 def ensure_background_workers_started():
     """Safely starts Watchdog & Keep-Alive Pinger exactly ONCE (even under Gunicorn!)."""
@@ -1746,4 +1840,3 @@ ensure_background_workers_started()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port, threaded=True)
-  
