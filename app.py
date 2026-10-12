@@ -686,18 +686,17 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
                     BOT_STATUS["last_wish_sent"] = f"{greeting_title} at {ist_now.strftime('%I:%M %p IST')} in {tid}"
             except Exception as e:
                 BOT_STATUS["last_error"] = f"Wish Send Warning: {e}"
-    def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
-    global REPLY_TO_ALL_MESSAGES, BOT_PERSONA, ENABLE_AUTO_READD_LEFT_USERS
+    OWNER_CMD_READY = True
 
+def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
+    global REPLY_TO_ALL_MESSAGES, BOT_PERSONA, ENABLE_AUTO_READD_LEFT_USERS
     cmd_text = text.strip()
     low_cmd = cmd_text.lower()
-
     if not low_cmd.startswith("/"):
         return False
-
     if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads):
         return True
-
+    
     reply_msg = None
 
     if low_cmd == "/uptime":
