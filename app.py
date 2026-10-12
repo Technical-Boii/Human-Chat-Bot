@@ -44,7 +44,7 @@ PING_INTERVAL_SECONDS = 180
 
 # 4. ULTRA-FAST SPEED (0.5s) & DIVYA BOT SETTINGS
 BOT_NAME = "Divya"
-CHECK_INTERVAL = 0.5
+CHECK_INTERVAL = 2.5
 ACTIVE_THREADS_TO_SCAN = 3
 MAX_OUTPUT_TOKENS = 120
 REPLY_TO_ALL_MESSAGES = True
@@ -1708,10 +1708,14 @@ def run_main_bot_polling_loop(
                             cl, tid, mid, sender_uname, text, media_label,
                             media_b64, media_mime, time_tag, bot_own_replies
                         )
-        except Exception as e:
+                except Exception as e:
             consecutive_errors += 1
-            BOT_STATUS["last_error"] = f"Loop Error: {e}"
-            time.sleep(2)
+            err_str = str(e)
+            BOT_STATUS["last_error"] = f"Loop Error: {err_str}"
+            if "403" in err_str or "1404006" in err_str:
+                time.sleep(15)
+            else:
+                time.sleep(2)
             if consecutive_errors >= 25: return
         time.sleep(CHECK_INTERVAL)
 
