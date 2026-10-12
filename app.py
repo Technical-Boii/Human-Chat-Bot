@@ -1216,8 +1216,10 @@ PART_7_READY = True
 class RawObj:
     def __init__(self, d):
         self._d = d if isinstance(d, dict) else {}
-        for k, v in self._d.items(): setattr(self, k, v)
-    def dict(self): return self._d
+        for k, v in self._d.items():
+            setattr(self, k, v)
+    def dict(self):
+        return self._d
 
 def login_instagram_bulletproof(cl, raw_session_id):
     clean_sid = unquote(raw_session_id).strip()
@@ -1291,20 +1293,32 @@ def fetch_threads_safe(cl, amount=3):
         BOT_STATUS["last_error"] = f"Raw Inbox Warning: {raw_err}"
         return cl.direct_threads(amount=amount)
 
-
-
 def extract_full_message_text(msg):
     try:
         for attr in ("text", "caption"):
             val = getattr(msg, attr, None)
-            if val: return str(val).strip()
+            if val:
+                return str(val).strip()
         link_obj = getattr(msg, "link", None)
         if isinstance(link_obj, dict):
-            if link_obj.get("text"): return str(link_obj["text"]).strip()
+            if link_obj.get("text"):
+                return str(link_obj["text"]).strip()
             l_ctx = link_obj.get("link_context")
-            if isinstance(l_ctx, dict) and l_ctx.get("link_url"): return str(l_ctx["link_url"]).strip()
-        if def send_reply_fast(cl, tid, mid, final_reply):
-    if not final_reply: return False
+            if isinstance(l_ctx, dict) and l_ctx.get("link_url"):
+                return str(l_ctx["link_url"]).strip()
+        if hasattr(msg, "dict"):
+            md = msg.dict()
+            if md.get("text"):
+                return str(md["text"]).strip()
+            if isinstance(md.get("link"), dict) and md["link"].get("text"):
+                return str(md["link"]["text"]).strip()
+    except Exception:
+        pass
+    return ""
+
+def send_reply_fast(cl, tid, mid, final_reply):
+    if not final_reply:
+        return False
     try:
         token = str(random.randint(10**18, 10**19 - 1))
         data = {
@@ -1316,32 +1330,29 @@ def extract_full_message_text(msg):
             "text": str(final_reply),
             "_uuid": getattr(cl, "uuid", ""),
         }
-        if mid: data["replied_to_item_id"] = str(mid)
+        if mid:
+            data["replied_to_item_id"] = str(mid)
         req_data = cl.with_default_params(data) if hasattr(cl, "with_default_params") else data
         cl.private_request("direct_v2/threads/broadcast/text/", data=req_data, with_signature=False)
         return True
     except Exception:
         pass
     try:
-        cl.direct_send(str(final_reply), thread_ids=[int(tid)])
+        # thread_ids को सुरक्षित तरीके से पास करें
+        thread_id_val = int(tid) if str(tid).isdigit() else tid
+        cl.direct_send(str(final_reply), thread_ids=[thread_id_val])
         return True
     except Exception as e3:
         BOT_STATUS["last_error"] = f"All Send Methods Failed: {e3}"
         return False
-hasattr(msg, "dict"):
-            md = msg.dict()
-            if md.get("text"): return str(md["text"]).strip()
-            if isinstance(md.get("link"), dict) and md["link"].get("text"): return str(md["link"]["text"]).strip()
-    except Exception:
-        pass
-    return ""
 
 def check_if_user_left_action_log(msg):
     try:
         if str(getattr(msg, "item_type", "") or "").lower() == "action_log":
             al = getattr(msg, "action_log", {})
             desc = str(al.get("description", "") if isinstance(al, dict) else getattr(al, "description", "")).lower()
-            if "left the group" in desc or "left the chat" in desc: return True
+            if "left the group" in desc or "left the chat" in desc:
+                return True
     except Exception:
         pass
     return False
@@ -1352,7 +1363,8 @@ def check_if_user_added_action_log(msg):
             al = getattr(msg, "action_log", {})
             desc = str(al.get("description", "") if isinstance(al, dict) else getattr(al, "description", ""))
             low_d = desc.lower()
-            if "added " in low_d or "joined the group" in low_d or "joined the chat" in low_d: return desc
+            if "added " in low_d or "joined the group" in low_d or "joined the chat" in low_d:
+                return desc
     except Exception:
         pass
     return None
