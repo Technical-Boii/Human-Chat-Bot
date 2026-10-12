@@ -283,7 +283,6 @@ def check_is_spamming(tid, user_id):
         dq.clear()
         return True
     return False
-    
     def kick_user_from_group(cl, thread_id, user_id):
     """Removes a user from the Instagram group using 3 fallback methods."""
     tid_str = str(thread_id)
