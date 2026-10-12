@@ -1206,7 +1206,7 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
     return False
 
 PART_6_END = True
-        PART_7_READY = True
+PART_7_READY = True
 
 class RawObj:
     def __init__(self, d):
