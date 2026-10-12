@@ -22,7 +22,7 @@ MAIN_OWNER_ID = "alone.shayar.420"
 OWNER_USERNAMES = ["alone.shayar.420", "infiniteayush", "sonam_v_fulbandhe", "3003parischloe"]
 
 # 2. Working NEW + OLD Gemini API Keys (Auto-Rotation) & Instagram Session ID
-NEW_GEMINI_KEY = "AQ.Ab8RN6LrptafH6ARu9Iki_BPWzxi4jvMFnWsfbGI0I6Egx-wMQ"
+NEW_GEMINI_KEY = "AQ.Ab8RN6IyVwYjnm7MiUNJucI5kDqdGuhT6yjVf_QzU7x6z3X2fA"
 OLD_GEMINI_KEY = "AQ.Ab8RN6LkGqZzX9fU3Tju2sag1Awh3A9SW4JnDV5DVfDLhevPWw"
 ENV_GEMINI_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 
