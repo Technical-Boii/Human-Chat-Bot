@@ -1438,7 +1438,7 @@ def start_instagram_bot():
     )
 
 PART_7_END = True
-             PART_8_READY = True
+PART_8_READY = True
 
 BOSS_SCOLD_TRIGGER_WORDS = (
     "batmiji", "badtameezi", "badtamizi", "bhool gayi", "bhul gayi", "bhool gyi",
