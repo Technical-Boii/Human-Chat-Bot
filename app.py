@@ -266,8 +266,7 @@ def message_has_any_link(msg, extracted_text=""):
     except Exception:
         pass
     return False
-    
-def check_is_spamming(tid, user_id):
+    def check_is_spamming(tid, user_id):
     """Tracks message speed per user and returns True if user floods the group."""
     if not ENABLE_ANTI_SPAM:
         return False
@@ -283,7 +282,9 @@ def check_is_spamming(tid, user_id):
         dq.clear()
         return True
     return False
-    def kick_user_from_group(cl, thread_id, user_id):
+
+
+def kick_user_from_group(cl, thread_id, user_id):
     """Removes a user from the Instagram group using 3 fallback methods."""
     tid_str = str(thread_id)
     uid_str = str(user_id)
