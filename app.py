@@ -18,9 +18,9 @@ from flask import Flask, jsonify, request
 # ==========================================
 
 # 1. Owner Details (Change Owner Name or IDs here anytime)
-OWNER_NAME = "Ravi", "ayush"
-MAIN_OWNER_ID = "alone.shayar.420", "infiniteayush"
-OWNER_USERNAMES = ["alone.shayar.420", "infiniteayush", "3003parischloe"]
+OWNER_NAME = "Ravi", "ayush", "Sonam"
+MAIN_OWNER_ID = "alone.shayar.420", "sonam_v_fulbandhe", "infiniteayush"
+OWNER_USERNAMES = ["alone.shayar.420", "infiniteayush", "sonam_v_fulbandhe", "3003parischloe"]
 
 # 2. Your working Gemini API Key & Instagram Session ID
 DIRECT_GEMINI_KEY = "AQ.Ab8RN6LkGqZzX9fU3Tju2sag1Awh3A9SW4JnDV5DVfDLhevPWw"
