@@ -1242,52 +1242,7 @@ def login_instagram_bulletproof(cl, raw_session_id):
             bot_username = bot_username or "divya_bot"
     return bot_user_id, bot_username
 
-def fetch_threads_safe(cl, amount=3):
-    try:
-        raw_res = cl.private_request(
-            "direct_v2/inbox/",
-            params={
-                "visual_message_return_type": "unseen",
-                "thread_message_limit": "10",
-                "persistentBadging": "true",
-                "limit": str(amount)
-            }
-        )
-        inbox_threads = raw_res.get("inbox", {}).get("threads", [])
-        parsed_threads = []
-        for rt in inbox_threads[:amount]:
-            t_obj = RawObj(rt)
-            t_obj.id = str(rt.get("thread_id") or rt.get("id") or "")
-            users_list = []
-            for u in rt.get("users", []):
-                u_obj = RawObj(u)
-                u_obj.pk = str(u.get("pk") or u.get("id") or "")
-                u_obj.username = str(u.get("username") or "user")
-                users_list.append(u_obj)
-            inviter = rt.get("inviter")
-            if isinstance(inviter, dict) and inviter.get("pk"):
-                inv_pk = str(inviter.get("pk"))
-                if all(u.pk != inv_pk for u in users_list):
-                    inv_obj = RawObj(inviter)
-                    inv_obj.pk = inv_pk
-                    inv_obj.username = str(inviter.get("username") or "user")
-                    users_list.append(inv_obj)
-            t_obj.users = users_list
-            msgs_list = []
-            for m in rt.get("items", []):
-                m_obj = RawObj(m)
-                m_obj.id = str(m.get("item_id") or m.get("id") or "")
-                m_obj.user_id = str(m.get("user_id") or "")
-                m_obj.item_type = str(m.get("item_type") or "")
-                link_dict = m.get("link") if isinstance(m.get("link"), dict) else {}
-                m_obj.text = m.get("text") or link_dict.get("text") or ""
-                msgs_list.append(m_obj)
-            t_obj.messages = msgs_list
-            parsed_threads.append(t_obj)
-        return parsed_threads
-    except Exception as raw_err:
-        BOT_STATUS["last_error"] = f"Raw Inbox Warning: {raw_err}"
-        return cl.direct_threads(amount=amount)
+
 
 def extract_full_message_text(msg):
     try:
@@ -1295,7 +1250,77 @@ def extract_full_message_text(msg):
             val = getattr(msg, attr, None)
             if val:
                 return str(val).strip()
-        link_obj = getattr(msg, "link", None)
+        link_objdef fetch_threads_safe(cl, amount=3):
+    try:
+        # Step 1: Standard Direct Threads try karna (Kam risk wala endpoint)
+        threads = cl.direct_threads(amount=amount)
+        if threads:
+            parsed = []
+            for t in threads:
+                t_obj = RawObj(t if isinstance(t, dict) else getattr(t, "dict", lambda: {})())
+                t_obj.id = str(getattr(t, "id", "") or "")
+                
+                users_list = []
+                for u in getattr(t, "users", []):
+                    u_obj = RawObj(u if isinstance(u, dict) else getattr(u, "dict", lambda: {})())
+                    u_obj.pk = str(getattr(u, "pk", "") or getattr(u, "id", "") or "")
+                    u_obj.username = str(getattr(u, "username", "user"))
+                    users_list.append(u_obj)
+                t_obj.users = users_list
+
+                msgs_list = []
+                for m in getattr(t, "messages", []):
+                    m_obj = RawObj(m if isinstance(m, dict) else getattr(m, "dict", lambda: {})())
+                    m_obj.id = str(getattr(m, "id", "") or "")
+                    m_obj.user_id = str(getattr(m, "user_id", "") or "")
+                    m_obj.item_type = str(getattr(m, "item_type", "") or "")
+                    m_obj.text = getattr(m, "text", "") or ""
+                    msgs_list.append(m_obj)
+                t_obj.messages = msgs_list
+                parsed.append(t_obj)
+            return parsed
+    except Exception as e_std:
+        # Step 2: Agar standard fail ho tabhi direct_v2 inbox private request try karein
+        try:
+            time.sleep(1.0)
+            raw_res = cl.private_request(
+                "direct_v2/inbox/",
+                params={
+                    "visual_message_return_type": "unseen",
+                    "thread_message_limit": "10",
+                    "persistentBadging": "true",
+                    "limit": str(amount)
+                }
+            )
+            inbox_threads = raw_res.get("inbox", {}).get("threads", [])
+            parsed_threads = []
+            for rt in inbox_threads[:amount]:
+                t_obj = RawObj(rt)
+                t_obj.id = str(rt.get("thread_id") or rt.get("id") or "")
+                users_list = []
+                for u in rt.get("users", []):
+                    u_obj = RawObj(u)
+                    u_obj.pk = str(u.get("pk") or u.get("id") or "")
+                    u_obj.username = str(u.get("username") or "user")
+                    users_list.append(u_obj)
+                t_obj.users = users_list
+                msgs_list = []
+                for m in rt.get("items", []):
+                    m_obj = RawObj(m)
+                    m_obj.id = str(m.get("item_id") or m.get("id") or "")
+                    m_obj.user_id = str(m.get("user_id") or "")
+                    m_obj.item_type = str(m.get("item_type") or "")
+                    link_dict = m.get("link") if isinstance(m.get("link"), dict) else {}
+                    m_obj.text = m.get("text") or link_dict.get("text") or ""
+                    msgs_list.append(m_obj)
+                t_obj.messages = msgs_list
+                parsed_threads.append(t_obj)
+            return parsed_threads
+        except Exception as raw_err:
+            BOT_STATUS["last_error"] = f"Fetch Warning: {raw_err}"
+            return []
+    return []
+ = getattr(msg, "link", None)
         if isinstance(link_obj, dict):
             if link_obj.get("text"):
                 return str(link_obj["text"]).strip()
