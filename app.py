@@ -22,17 +22,18 @@ MAIN_OWNER_ID = "alone.shayar.420"
 OWNER_USERNAMES = ["alone.shayar.420", "infiniteayush", "sonam_v_fulbandhe", "3003parischloe"]
 
 # 2. Working NEW + OLD Gemini API Keys (Auto-Rotation) & Instagram Session ID
-NEW_GEMINI_KEY = "AQ.Ab8RN6IyVwYjnm7MiUNJucI5kDqdGuhT6yjVf_QzU7x6z3X2fA"
+FRESH_GEMINI_KEY = os.getenv("FRESH_GEMINI_KEY", "AQ.Ab8RN6KEZv0YBW2SIdE4skbVkXSoQDWE75plt9tNwbY3Bt6uWQ").strip()
+NEW_GEMINI_KEY = FRESH_GEMINI_KEY
 OLD_GEMINI_KEY = "AQ.Ab8RN6LkGqZzX9fU3Tju2sag1Awh3A9SW4JnDV5DVfDLhevPWw"
 ENV_GEMINI_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 
 GEMINI_KEYS_LIST = []
-for k in [NEW_GEMINI_KEY, OLD_GEMINI_KEY, ENV_GEMINI_KEY]:
+for k in [FRESH_GEMINI_KEY, NEW_GEMINI_KEY, OLD_GEMINI_KEY, ENV_GEMINI_KEY]:
     if k and k not in GEMINI_KEYS_LIST:
         GEMINI_KEYS_LIST.append(k)
 
-DIRECT_GEMINI_KEY = NEW_GEMINI_KEY
-GEMINI_API_KEY = GEMINI_KEYS_LIST[0]
+DIRECT_GEMINI_KEY = FRESH_GEMINI_KEY
+GEMINI_API_KEY = GEMINI_KEYS_LIST[0] if GEMINI_KEYS_LIST else FRESH_GEMINI_KEY
 INSTA_SESSION_ID = os.getenv("INSTA_SESSION_ID", "").strip()
 
 # 3. Your Live Render App URL (24/7 Uptime Pinger)
@@ -269,7 +270,6 @@ def check_is_spamming(tid, user_id):
     return False
 
 PART_2_END = True
-
 PART_3_READY = True
 
 def kick_user_from_group(cl, thread_id, user_id):
@@ -437,7 +437,6 @@ def react_heart_async(cl, thread_id, message_id):
     threading.Thread(target=_heart_worker, daemon=True).start()
 
 PART_3_END = True
-
 PART_4_READY = True
 
 def extract_media_for_gemini(msg):
@@ -521,14 +520,14 @@ def extract_media_for_gemini(msg):
     return None, None, None
 
 def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_tokens_override=None):
-    global LOCKED_MODEL, GEMINI_API_KEY
+    global LOCKED_MODEL, GEMINI_API_KEY, FRESH_GEMINI_KEY
     all_models = [
         "gemini-2.5-flash",
         "gemini-2.5-flash-lite",
         "gemini-2.0-flash",
         "gemini-2.0-flash-lite",
-        "gemini-3.5-flash-lite",
-        "gemini-3.5-flash"
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-8b"
     ]
     if LOCKED_MODEL:
         models_to_try = [LOCKED_MODEL] + [m for m in all_models if m != LOCKED_MODEL]
@@ -568,33 +567,32 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
     }
 
     live_env_key = os.getenv("GEMINI_API_KEY", "").strip()
+    active_fresh = globals().get("FRESH_GEMINI_KEY") or os.getenv("FRESH_GEMINI_KEY", "").strip() or NEW_GEMINI_KEY
     keys_to_try = []
-    for k in [FRESH_GEMINI_KEY, live_env_key, OLD_GEMINI_KEY if "OLD_GEMINI_KEY" in globals() else ""]:
+    for k in [active_fresh, live_env_key, OLD_GEMINI_KEY if "OLD_GEMINI_KEY" in globals() else ""]:
         if k and k not in keys_to_try:
             keys_to_try.append(k)
 
     for active_key in keys_to_try:
         for model_name in models_to_try:
-            # Supports both AI Studio (generativelanguage) AND Vertex Express (aiplatform for AQ. keys!)
             endpoints = [
                 (
-                    f"https://aiplatform.googleapis.com/v1/publishers/google/models/{model_name}:generateContent?key={active_key}",
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={active_key}",
                     {"Content-Type": "application/json"}
                 ),
                 (
-                    f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={active_key}",
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent",
                     {"Content-Type": "application/json", "x-goog-api-key": active_key}
-                )
-            ] if active_key.startswith("AQ.") else [
+                ),
                 (
-                    f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={active_key}",
-                    {"Content-Type": "application/json", "x-goog-api-key": active_key}
+                    f"https://aiplatform.googleapis.com/v1/publishers/google/models/{model_name}:generateContent?key={active_key}",
+                    {"Content-Type": "application/json"}
                 )
             ]
 
             for url, req_headers in endpoints:
                 try:
-                    response = http_session.post(url, headers=req_headers, data=json.dumps(payload), timeout=4.0)
+                    response = http_session.post(url, headers=req_headers, data=json.dumps(payload), timeout=4.5)
                     if response.status_code == 200:
                         result = response.json()
                         candidates = result.get("candidates", [])
@@ -665,7 +663,6 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
                 BOT_STATUS["last_error"] = f"Wish Send Warning: {e}"
 
 PART_4_END = True
-
 PART_5_READY = True
 
 def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
@@ -965,7 +962,6 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
     return False
 
 PART_5_END = True
-
 PART_6_READY = True
 
 MODE_PRESETS = {
@@ -1210,8 +1206,7 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
     return False
 
 PART_6_END = True
-
-PART_7_READY = True
+        PART_7_READY = True
 
 class RawObj:
     def __init__(self, d):
@@ -1305,7 +1300,7 @@ def extract_full_message_text(msg):
                 return str(link_obj["text"]).strip()
             l_ctx = link_obj.get("link_context")
             if isinstance(l_ctx, dict) and l_ctx.get("link_url"):
-                return str(l_ctx["link_url"]).strip()
+                return str(link_url).strip() if (link_url := l_ctx.get("link_url")) else ""
         if hasattr(msg, "dict"):
             md = msg.dict()
             if md.get("text"):
@@ -1338,7 +1333,6 @@ def send_reply_fast(cl, tid, mid, final_reply):
     except Exception:
         pass
     try:
-        # thread_ids को सुरक्षित तरीके से पास करें
         thread_id_val = int(tid) if str(tid).isdigit() else tid
         cl.direct_send(str(final_reply), thread_ids=[thread_id_val])
         return True
@@ -1444,8 +1438,7 @@ def start_instagram_bot():
     )
 
 PART_7_END = True
-
-PART_8_READY = True
+             PART_8_READY = True
 
 BOSS_SCOLD_TRIGGER_WORDS = (
     "batmiji", "badtameezi", "badtamizi", "bhool gayi", "bhul gayi", "bhool gyi",
@@ -1745,5 +1738,4 @@ ensure_background_workers_started()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port, threaded=True)
-
-
+                            
