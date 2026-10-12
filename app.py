@@ -14,7 +14,7 @@ from instagrapi import Client
 from flask import Flask, jsonify, request
 
 # ==========================================
-# 🛠️ CUSTOMIZABLE PARAMETERS (PART 1)
+# CUSTOMIZABLE PARAMETERS (PART 1)
 # ==========================================
 
 # 1. Owner Details (Fixed Tuple Bug -> Clean String + List for Safe Checking)
@@ -23,37 +23,45 @@ OWNER_NAMES_LIST = ["ravi", "ayush", "sonam"]
 MAIN_OWNER_ID = "alone.shayar.420"
 OWNER_USERNAMES = ["alone.shayar.420", "infiniteayush", "sonam_v_fulbandhe", "3003parischloe"]
 
-# 2. Your working Gemini API Key & Instagram Session ID
-DIRECT_GEMINI_KEY = "AQ.Ab8RN6LkGqZzX9fU3Tju2sag1Awh3A9SW4JnDV5DVfDLhevPWw"
-GEMINI_API_KEY = (os.getenv("GEMINI_API_KEY", "") or DIRECT_GEMINI_KEY).strip()
+# 2. Working NEW + OLD Gemini API Keys (Auto-Rotation) & Instagram Session ID
+NEW_GEMINI_KEY = "AQ.Ab8RN6LrptafH6ARu9Iki_BPWzxi4jvMFnWsfbGI0I6Egx-wMQ"
+OLD_GEMINI_KEY = "AQ.Ab8RN6LkGqZzX9fU3Tju2sag1Awh3A9SW4JnDV5DVfDLhevPWw"
+ENV_GEMINI_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+
+GEMINI_KEYS_LIST = []
+for k in [NEW_GEMINI_KEY, OLD_GEMINI_KEY, ENV_GEMINI_KEY]:
+    if k and k not in GEMINI_KEYS_LIST:
+        GEMINI_KEYS_LIST.append(k)
+
+DIRECT_GEMINI_KEY = NEW_GEMINI_KEY
+GEMINI_API_KEY = GEMINI_KEYS_LIST[0]
 INSTA_SESSION_ID = os.getenv("INSTA_SESSION_ID", "").strip()
 
 # 3. Your Live Render App URL
 DEFAULT_RENDER_URL = "https://human-chat-bot.onrender.com"
 RENDER_EXTERNAL_URL = (os.getenv("RENDER_EXTERNAL_URL", "") or DEFAULT_RENDER_URL).strip()
-PING_INTERVAL_SECONDS = 180     # Self-ping every 3 minutes (180s) for 24/7 uptime
+PING_INTERVAL_SECONDS = 180
 
 # 4. ULTRA-FAST SPEED (0.5s) & DIVYA BOT SETTINGS
 BOT_NAME = "Divya"
-CHECK_INTERVAL = 0.5            # Checks every 0.5 seconds for instant reply!
-ACTIVE_THREADS_TO_SCAN = 3      # Top 3 active chats
-MAX_OUTPUT_TOKENS = 55          # Ultra-short, real human-like fast replies!
-REPLY_TO_ALL_MESSAGES = True    # True = Reply to every message (with or without saying 'divya')
+CHECK_INTERVAL = 0.5
+ACTIVE_THREADS_TO_SCAN = 3
+MAX_OUTPUT_TOKENS = 120
+REPLY_TO_ALL_MESSAGES = True
 TRIGGER_WORD = "divya"
-MEMORY_MAX_MESSAGES = 60        # Remembers 60 messages per group
+MEMORY_MAX_MESSAGES = 60
 MEMORY_FILE_PATH = "rudra_memory.json"
 
 # 5. PRO FEATURES, SMART HEART REACTION, ANTI-LINK, AUTO WELCOME & WISHER
-ENABLE_AUTO_SEEN = True                 # Auto Blue-Tick in background thread
-ENABLE_MESSAGE_REACTIONS = True         # Smart Selective Heart ❤️ Reaction Only!
-ENABLE_MULTIMODAL_MEDIA = True          # Understand & reply to Photos, Voice Notes & Reels
-ENABLE_AUTO_WISHER = True               # Auto Good Morning/Afternoon/Evening/Night (Mumbai Time)
-ENABLE_ANTI_LINK = True                 # Warn 3 times on links, then Kick user on 3rd time!
-MAX_LINK_WARNINGS = 3                   # Kick on 3rd link
-ENABLE_AUTO_READD_LEFT_USERS = True     # Auto Re-Add users who leave the group & roast them!
-ENABLE_AUTO_WELCOME_NEW_USERS = True    # Auto Welcome & Hype newly added group members!
+ENABLE_AUTO_SEEN = True
+ENABLE_MESSAGE_REACTIONS = True
+ENABLE_MULTIMODAL_MEDIA = True
+ENABLE_AUTO_WISHER = True
+ENABLE_ANTI_LINK = True
+MAX_LINK_WARNINGS = 3
+ENABLE_AUTO_READD_LEFT_USERS = True
+ENABLE_AUTO_WELCOME_NEW_USERS = True
 
-# 5A. SMART HEART REACTION KEYWORDS (Reacts ❤️ ONLY on praise, good words, or Owner praise)
 POSITIVE_REACTION_WORDS = [
     "love", "pyar", "pyaar", "cute", "sweet", "best", "nice", "awesome", "mast", "op",
     "super", "superb", "great", "smart", "queen", "beautiful", "pretty", "gorgeous",
@@ -70,14 +78,12 @@ ABUSE_BLOCK_REACTION_WORDS = [
     "kutta", "sala", "saale", "madarchod", "bhenchod", "randi", "bakwas", "faltu", "pagal"
 ]
 
-# 5B. ADMIN & USER PRO FEATURE PARAMETERS (Customizable)
-ENABLE_ANTI_SPAM = True                 # Auto-detect flood/spamming in group
-SPAM_MSG_LIMIT = 6                      # Max messages allowed within SPAM_TIME_WINDOW
-SPAM_TIME_WINDOW = 5.0                  # Seconds window to check flood spam
-MAX_SPAM_WARNINGS = 3                   # Kick user on 3rd spam strike
-PUBLIC_CMD_COOLDOWN = 15.0              # Cooldown (seconds) for normal users using public commands
+ENABLE_ANTI_SPAM = True
+SPAM_MSG_LIMIT = 6
+SPAM_TIME_WINDOW = 5.0
+MAX_SPAM_WARNINGS = 3
+PUBLIC_CMD_COOLDOWN = 15.0
 
-# 24-Hour Mumbai Time (IST) hours for automatic group wishes
 WISH_SCHEDULE = {
     8:  ("Good Morning ☀️", "subah ki taaza kiran, naya josh aur dosti"),
     13: ("Good Afternoon 🌤️", "dophar ki garmi, masti aur desi swag"),
@@ -85,7 +91,6 @@ WISH_SCHEDULE = {
     23: ("Good Night 🌙", "raat ki khamoshi, meethi neend aur sapne")
 }
 
-# 6. Default Bot Persona (Ultra-Short Real Human Girl + Strict Boss Respect for alone.shayar.420)
 DEFAULT_BOT_PERSONA = f"""Your name is Divya.
 CRITICAL OWNER RULE: Your creator/owner/boss is Ravi (IG: @{MAIN_OWNER_ID}) along with {OWNER_NAME}. DO NOT mention {OWNER_NAME} or @{MAIN_OWNER_ID} in normal replies! Mention them ONLY WHEN someone specifically asks who created you, who your owner/boss is, or talks about them.
 SUPREME BOSS RESPECT RULE FOR @{MAIN_OWNER_ID} (RAVI):
@@ -103,7 +108,6 @@ CORE PERSONALITY RULES:
 9. CRITICAL HUMAN RULE: Agar koi user aapse puche "Tu AI hai?", "Tu bot hai?", "Auto reply hai kya?", ya aisi koi bhi baat bole jisse lage ki aap insaan nahi ho, toh aapko turant gussa hona hai. Ekdam human style mein gusse se bhara, short aur savage gaali wala reply do (e.g., "Tera baap bot hai bsdk", "AI hogi teri m@ j@at ke baal, ekdam real ladki Divya hoon samjha na bkl"). Machine jaisa 'I am an AI assistant' bilkul mat bolna.
 10. Saare replies ekdam short, punchy, fast, aur directly dimag par lagne wale hone chahiye (Maximum 1-2 short lines). Bilkul bhi lambe boring paragraphs mat likhna. Always speak in a mix of Hindi and English (Hinglish) unless the user abuses you in another regional language."""
 
-
 BOT_PERSONA = DEFAULT_BOT_PERSONA
 ACTIVE_MODE_NAME = "Default Savage Divya"
 http_session = requests.Session()
@@ -113,7 +117,7 @@ IS_BOT_WORKER_STARTED = False
 LOCKED_MODEL = None
 MUTED_THREADS = set()
 LOCKED_THREADS = set()
-CHUP_USERS = set()              # Stores (tid, username_lower) for /chup command
+CHUP_USERS = set()
 TARGETED_USERS = {}
 VIP_USERS = set([u.lower() for u in OWNER_USERNAMES])
 USER_NICKNAMES = {}
@@ -136,12 +140,7 @@ TOTAL_PINGS_COUNT = 0
 LAST_PING_LATENCY_MS = 0
 BOT_RESTART_COUNT = 0
 
-# ==========================================
-# 🇮🇳 MUMBAI TIME, UPTIME, MEMORY, ANTI-LINK, ANTI-SPAM & AUTO RE-ADD ENGINE (PART 2)
-# ==========================================
-
 def get_mumbai_time():
-    """Returns exact current Indian Standard Time (Asia/Kolkata - Mumbai UTC+5:30)."""
     utc_now = datetime.now(timezone.utc)
     ist_tz = timezone(timedelta(hours=5, minutes=30))
     return utc_now.astimezone(ist_tz)
@@ -150,7 +149,6 @@ BOT_START_TIME_IST = get_mumbai_time()
 BOT_START_TIME_STR = BOT_START_TIME_IST.strftime("%d %b %Y, %I:%M:%S %p IST")
 
 def get_uptime_details():
-    """Calculates exact live running time (Days, Hours, Minutes, Seconds) & Live Date/Time."""
     now_ist = get_mumbai_time()
     delta = now_ist - BOT_START_TIME_IST
     total_seconds = int(delta.total_seconds())
@@ -197,7 +195,6 @@ BOT_STATUS = {
 }
 
 def load_persistent_memory():
-    """Loads chat history, VIPs, and nicknames from disk."""
     global VIP_USERS, USER_NICKNAMES
     if not os.path.exists(MEMORY_FILE_PATH):
         return
@@ -214,7 +211,6 @@ def load_persistent_memory():
         BOT_STATUS["last_error"] = f"Memory Load Warning: {e}"
 
 def save_persistent_memory_async():
-    """Saves chat history, VIP list, and nicknames safely in background."""
     if MEMORY_SAVE_LOCK.locked():
         return
     def _save_worker():
@@ -281,7 +277,6 @@ def check_is_spamming(tid, user_id):
         dq.clear()
         return True
     return False
-
 def kick_user_from_group(cl, thread_id, user_id):
     tid_str = str(thread_id)
     uid_str = str(user_id)
@@ -386,10 +381,6 @@ def keep_alive_pinger():
         except Exception as e:
             BOT_STATUS["last_self_ping"] = f"Ping Warning: {str(e)}"
 
-# ==========================================
-# ❤️ SMART HEART REACTION & MEDIA EXTRACTOR (PART 3B)
-# ==========================================
-
 FORBIDDEN_LEAK_PHRASES = (
     "the prompt",
     "contains instructions",
@@ -420,7 +411,6 @@ def mark_message_seen_async(cl, thread_id, message_id):
     threading.Thread(target=_seen_worker, daemon=True).start()
 
 def should_react_with_heart(text):
-    """Returns True ONLY if the user praises Divya, praises Owner Ravi, or says something genuinely sweet/positive!"""
     if not ENABLE_MESSAGE_REACTIONS or not text:
         return False
     low_t = text.lower().strip()
@@ -466,14 +456,8 @@ def react_heart_async(cl, thread_id, message_id):
             except Exception:
                 pass
     threading.Thread(target=_heart_worker, daemon=True).start()
-
-
-def extract_media_for_gemini(msg):
+    def extract_media_for_gemini(msg):
     if not ENABLE_MULTIMODAL_MEDIA:
-        return None, None, None
-
-    item_type = str(getattr(msg, "item_type", "") or "").lower()
-    if item_type in ("text", "action_log", "link"):
         return None, None, None
 
     item_type = str(getattr(msg, "item_type", "") or "").lower()
@@ -559,15 +543,16 @@ def extract_media_for_gemini(msg):
     return None, None, None
 
 def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_tokens_override=None):
-    """PURE GEMINI AI ENGINE: Uses system_instruction & blocks any meta-prompt leaks!"""
-    global LOCKED_MODEL
+    global LOCKED_MODEL, GEMINI_API_KEY
 
     all_models = [
-        "gemini-2.5-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-2.0-flash",
-        "gemini-2.0-flash-lite",
         "gemini-3.5-flash-lite",
+        "gemini-2.5-flash-lite",
+        "gemini-2.0-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-2.5-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-8b",
         "gemini-3.5-flash"
     ]
     
@@ -612,29 +597,41 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
         }
     }
 
-    for model_name in models_to_try:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={GEMINI_API_KEY}"
-        try:
-            response = http_session.post(url, headers=headers, data=json.dumps(payload), timeout=3.5)
-            if response.status_code == 200:
-                result = response.json()
-                candidates = result.get("candidates", [])
-                if candidates:
-                    first_cand = candidates[0]
-                    if "content" in first_cand and "parts" in first_cand["content"]:
-                        raw_reply = first_cand["content"]["parts"][0].get("text", "").strip()
+    keys_to_try = GEMINI_KEYS_LIST if "GEMINI_KEYS_LIST" in globals() else [GEMINI_API_KEY]
+
+    for active_key in keys_to_try:
+        for model_name in models_to_try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={active_key}"
+            try:
+                response = http_session.post(url, headers=headers, data=json.dumps(payload), timeout=4.5)
+                if response.status_code == 200:
+                    result = response.json()
+                    candidates = result.get("candidates", [])
+                    if candidates:
+                        first_cand = candidates[0]
+                        content_obj = first_cand.get("content", {})
+                        parts_arr = content_obj.get("parts", [])
+                        raw_reply = ""
+                        for p in parts_arr:
+                            if "text" in p and not p.get("thought", False):
+                                raw_reply += p.get("text", "")
+                        raw_reply = raw_reply.strip()
                         if raw_reply:
                             low_rep = raw_reply.lower()
                             if any(bad_p in low_rep for bad_p in FORBIDDEN_LEAK_PHRASES):
                                 BOT_STATUS["last_error"] = f"Filtered meta-reply from {model_name}"
                                 continue
                             LOCKED_MODEL = model_name
+                            GEMINI_API_KEY = active_key
                             BOT_STATUS["locked_fast_model"] = model_name
+                            BOT_STATUS["last_error"] = "None (Working 100%)"
                             return raw_reply
-            else:
-                BOT_STATUS["last_error"] = f"{model_name} ({response.status_code})"
-        except Exception as e:
-            BOT_STATUS["last_error"] = str(e)
+                else:
+                    BOT_STATUS["last_error"] = f"{model_name} ({response.status_code})"
+                    if response.status_code in (400, 401, 403):
+                        break
+            except Exception as e:
+                BOT_STATUS["last_error"] = str(e)
 
     return None
 
@@ -647,7 +644,7 @@ def build_Wish_Message(greeting_title, theme_desc, thread_users):
         f"Write a fresh, unique, awesome 2-line Hindi/Urdu shayari in Hinglish for '{greeting_title}' "
         f"based on the theme: '{theme_desc}'. Do NOT mention any owner name. Just give the 2-line shayari."
     )
-    shayari_text = generate_gemini_reply(shayari_prompt, max_tokens_override=85)
+    shayari_text = generate_gemini_reply(shayari_prompt, max_tokens_override=120)
     if not shayari_text:
         return None
 
@@ -692,12 +689,7 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
                     BOT_STATUS["last_wish_sent"] = f"{greeting_title} at {ist_now.strftime('%I:%M %p IST')} in {tid}"
             except Exception as e:
                 BOT_STATUS["last_error"] = f"Wish Send Warning: {e}"
-# ==========================================
-# 👑 OWNER COMMANDS (PART 5)
-# ==========================================
-
-def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
-    """Executes core owner commands + delegates to pro admin commands."""
+    def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
     global REPLY_TO_ALL_MESSAGES, BOT_PERSONA, ENABLE_AUTO_READD_LEFT_USERS
 
     cmd_text = text.strip()
@@ -806,6 +798,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             f"⏳ Uptime: {up_str}\n"
             f"🎭 Mode: {ACTIVE_MODE_NAME}\n"
             f"⚡ Model: {BOT_STATUS['locked_fast_model']}\n"
+            f"⚠️ Info: {BOT_STATUS['last_error']}\n"
             f"💬 Reply: {BOT_STATUS['reply_mode']} | ⭐ VIPs: {len(VIP_USERS)}"
         )
 
@@ -901,12 +894,11 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
 
     elif low_cmd.startswith("/joke"):
         topic = cmd_text[5:].strip() or "desi friends aur group chat"
-        reply_msg = generate_gemini_reply(f"Tell a super funny, punchy 1-2 line desi Hinglish joke on '{topic}'!", max_tokens_override=75)
+        reply_msg = generate_gemini_reply(f"Tell a super funny, punchy 1-2 line desi Hinglish joke on '{topic}'!")
 
     elif low_cmd == "/quiz":
         reply_msg = generate_gemini_reply(
-            "Ask a fun, tricky, clever 2-line desi riddle (Dimagi Paheli) in Hinglish for the group members to solve! Don't reveal the answer yet!",
-            max_tokens_override=75
+            "Ask a fun, tricky, clever 2-line desi riddle (Dimagi Paheli) in Hinglish for the group members to solve! Don't reveal the answer yet!"
         )
 
     elif low_cmd.startswith("/spam"):
@@ -964,7 +956,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
 
     elif low_cmd.startswith("/shayari"):
         topic = cmd_text[8:].strip() or "attitude"
-        reply_msg = generate_gemini_reply(f"Write a hard-hitting 2-line Hindi/Urdu shayari in Hinglish on '{topic}'.", max_tokens_override=80)
+        reply_msg = generate_gemini_reply(f"Write a hard-hitting 2-line Hindi/Urdu shayari in Hinglish on '{topic}'.")
 
     elif low_cmd.startswith("/td"):
         target = cmd_text[3:].strip() or "group members"
@@ -972,7 +964,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
 
     elif low_cmd == "/summary":
         recent_chat = "\n".join(list(CHAT_MEMORY_REF.get(tid, []))[-25:]) or "Koi baat nahi hui."
-        reply_msg = generate_gemini_reply(f"Chat:\n{recent_chat}\nGive a funny 2-line Hinglish summary of what people were talking about!", max_tokens_override=80)
+        reply_msg = generate_gemini_reply(f"Chat:\n{recent_chat}\nGive a funny 2-line Hinglish summary of what people were talking about!")
 
     elif low_cmd.startswith("/title"):
         new_title = cmd_text[6:].strip()
@@ -1002,11 +994,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         return True
 
     return False
-    # ==========================================
-# 🛡️ PRO ADMIN COMMANDS: TAGALL, CHUP/BOL, MODE, ANTILINK/SPAM, AFK, LOCK, KICK/ADD (PART 6)
-# ==========================================
-
-MODE_PRESETS = {
+    MODE_PRESETS = {
     "savage": ("Savage Destroyer 🔥", "Strictly talk like an ultra-savage, ruthless desi roaster girl. Keep replies 5-10 words."),
     "cute": ("Cute & Sweet Dost 🥰", "Strictly talk like a super cute, sweet, caring and bubbly desi best friend. Keep replies 5-10 words."),
     "shayar": ("Desi Shayar ✍️", "Reply to every message in deep, attitude or romantic shayari style in 1-2 short lines."),
@@ -1014,12 +1002,10 @@ MODE_PRESETS = {
 }
 
 def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads=None):
-    """Handles all Pro Admin & Owner security/control commands including TagAll, Chup/Bol, Mode & Toggles."""
     global BOT_PERSONA, ACTIVE_MODE_NAME, ENABLE_ANTI_LINK, ENABLE_ANTI_SPAM
     low_cmd = cmd_text.lower()
     reply_msg = None
 
-    # 1. 📢 Mass Tag / Attendance (/tagall <message>)
     if low_cmd.startswith("/tagall"):
         custom_msg = cmd_text[7:].strip() or "Sabhi log haziri lagao, Boss ne bulaya hai! 🔥"
         t_users = []
@@ -1033,7 +1019,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         tags_str = " ".join(t_users) if t_users else "@everyone"
         reply_msg = f"📢 GROUP ATTENDANCE CALL:\n💬 {custom_msg}\n\n🔔 {tags_str}"
 
-    # 2. 🔇 Individual User Mute (/chup @username & /bol @username)
     elif low_cmd.startswith("/chup"):
         target_u = cmd_text[5:].strip().lstrip("@").lower()
         if not target_u:
@@ -1054,7 +1039,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
             BOT_STATUS["chup_users_count"] = len(CHUP_USERS)
             reply_msg = f"🔊 @{target_u} par se pabandi hata di gayi hai! Ab bol sakta hai."
 
-    # 3. 🤖 AI Persona Switcher Presets (/mode savage, /mode cute, /mode shayar, /mode gangster, or ANY custom mode!)
     elif low_cmd.startswith("/mode"):
         mode_arg = cmd_text[5:].strip()
         low_arg = mode_arg.lower()
@@ -1081,7 +1065,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
             BOT_STATUS["active_persona_mode"] = ACTIVE_MODE_NAME
             reply_msg = f"🎭 Hukum Mere Aaka! Divya ab **'{mode_arg}'** ban gayi hai! 🔥"
 
-    # 4. 🛡️ Admin Toggle Switch (/antilink on/off & /antispam on/off)
     elif low_cmd.startswith("/antilink"):
         arg = cmd_text[9:].strip().lower()
         if arg == "off":
@@ -1108,7 +1091,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         else:
             reply_msg = f"🛡️ Anti-Spam abhi **{'ON' if ENABLE_ANTI_SPAM else 'OFF'}** hai. Badalne ke liye likho: /antispam on ya /antispam off"
 
-    # 5. Smart AFK Mode (/afk <reason> and /unafk)
     elif low_cmd.startswith("/afk"):
         reason = cmd_text[4:].strip() or "kisi zaroori kaam mein busy hain"
         now_str = get_mumbai_time().strftime("%I:%M %p IST")
@@ -1129,7 +1111,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         BOT_STATUS["boss_afk_status"] = "Online"
         reply_msg = f"🔥 Boss @{MAIN_OWNER_ID} is BACK ONLINE! AFK Mode hata diya gaya hai! 👑"
 
-    # 6. Night Curfew / Group Lock Mode (/lock and /unlock)
     elif low_cmd == "/lock":
         LOCKED_THREADS.add(tid)
         BOT_STATUS["locked_groups_count"] = len(LOCKED_THREADS)
@@ -1143,7 +1124,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         BOT_STATUS["locked_groups_count"] = len(LOCKED_THREADS)
         reply_msg = f"🔓 GROUP UNLOCKED! Curfew khatam, ab sab wapas baatein kar sakte hain! 🎉🔥"
 
-    # 7. Ghost / Inactive Members Detector (/ghosts)
     elif low_cmd == "/ghosts":
         ghost_list = []
         if current_threads:
@@ -1164,7 +1144,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         else:
             reply_msg = "✅ Is group mein koi Ghost nahi hai Boss! Sabhi members active hain! 🔥"
 
-    # 8. Direct Admin Kick & Add Commands (/kick @username & /add @username)
     elif low_cmd.startswith("/kick"):
         target_u = cmd_text[5:].strip().lstrip("@").lower()
         if not target_u:
@@ -1225,7 +1204,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
     return False
 
 def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False):
-    """Allows group members to use kept utility commands (/weather, /meaning, /news) with a 15s cooldown."""
     cmd_text = text.strip()
     low_cmd = cmd_text.lower()
 
@@ -1258,8 +1236,7 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
             reply_msg = "Usage: /meaning <word>"
     elif low_cmd == "/news":
         reply_msg = generate_gemini_reply(
-            "Share 2 interesting trending desi news headlines in 2 short Hinglish lines with full swag! Do not mention owner.",
-            max_tokens_override=75
+            "Share 2 interesting trending desi news headlines in 2 short Hinglish lines with full swag! Do not mention owner."
         )
 
     if reply_msg:
@@ -1268,12 +1245,7 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
         return True
 
     return False
-    # ==========================================
-# 🚀 ULTRA-FAST OPTIMIZED BOT SETUP + WELCOME & ANTI-LINK FIX (PART 7)
-# ==========================================
-
-class RawObj:
-    """Lightweight wrapper so raw Instagram JSON works seamlessly with all existing functions!"""
+        class RawObj:
     def __init__(self, d):
         self._d = d if isinstance(d, dict) else {}
         for k, v in self._d.items():
@@ -1282,7 +1254,6 @@ class RawObj:
         return self._d
 
 def login_instagram_bulletproof(cl, raw_session_id):
-    """Logs into Instagram safely even if Instagram throws 403 (1404006 item_ack) during session login!"""
     clean_sid = unquote(raw_session_id).strip()
     cl.delay_range = [0, 0]
 
@@ -1314,7 +1285,6 @@ def login_instagram_bulletproof(cl, raw_session_id):
     return bot_user_id, bot_username
 
 def fetch_threads_safe(cl, amount=3):
-    """PRIMARY: Uses Direct Raw Inbox API FIRST & extracts all text + links accurately!"""
     try:
         raw_res = cl.private_request(
             "direct_v2/inbox/",
@@ -1368,7 +1338,6 @@ def fetch_threads_safe(cl, amount=3):
         return cl.direct_threads(amount=amount)
 
 def send_reply_fast(cl, tid, mid, final_reply):
-    """Uses Raw Broadcast API FIRST to bypass 1404006 item_ack errors & send replies in <0.3s!"""
     if not final_reply:
         return False
     try:
@@ -1413,7 +1382,6 @@ def send_reply_fast(cl, tid, mid, final_reply):
         return False
 
 def extract_full_message_text(msg):
-    """Lightning-fast text, link text, and media caption extractor."""
     try:
         for attr in ("text", "caption"):
             val = getattr(msg, attr, None)
@@ -1437,7 +1405,6 @@ def extract_full_message_text(msg):
     return ""
 
 def check_if_user_left_action_log(msg):
-    """Fast check for left group action logs."""
     try:
         if str(getattr(msg, "item_type", "") or "").lower() == "action_log":
             al = getattr(msg, "action_log", {})
@@ -1449,7 +1416,6 @@ def check_if_user_left_action_log(msg):
     return False
 
 def check_if_user_added_action_log(msg):
-    """Detects when a new user is added to the group via Instagram action_log!"""
     try:
         if str(getattr(msg, "item_type", "") or "").lower() == "action_log":
             al = getattr(msg, "action_log", {})
@@ -1462,7 +1428,6 @@ def check_if_user_added_action_log(msg):
     return None
 
 def trigger_welcome_new_user(cl, tid, new_uname, bot_own_replies, action_desc=""):
-    """Welcomes newly added members in a non-blocking background thread via Gemini AI!"""
     def _welcome_worker():
         target_tag = f"@{new_uname}" if new_uname and new_uname != "dost" else "naye member"
         prompt = (
@@ -1479,7 +1444,6 @@ def trigger_welcome_new_user(cl, tid, new_uname, bot_own_replies, action_desc=""
     threading.Thread(target=_welcome_worker, daemon=True).start()
 
 def trigger_readd_and_roast(cl, tid, left_uid, left_uname, bot_own_replies, group_members_set=None):
-    """Background thread re-add and roast — Strictly uses Gemini AI as Divya!"""
     def _worker():
         readded = add_user_back_to_group(cl, tid, left_uid)
         if readded and group_members_set is not None:
@@ -1540,12 +1504,8 @@ def start_instagram_bot():
         cl, bot_user_id, bot_username, processed_msg_ids,
         recently_readded, recently_welcomed, bot_own_replies, group_members,
         consecutive_errors, loop_counter
-    )
-    # ==========================================
-# 🚀 0.5s PARALLEL MAIN LOOP, BOSS RESPECT FILTER, WATCHDOG & SERVER (PART 8)
-# ==========================================
-
-BOSS_SCOLD_TRIGGER_WORDS = (
+)
+                BOSS_SCOLD_TRIGGER_WORDS = (
     "batmiji", "badtameezi", "badtamizi", "bhool gayi", "bhul gayi", "bhool gyi",
     "bhul gyi", "banane wale", "ravi ko gaali", "mujhse", "mujhe roast", "mujhe gaali",
     "apne malik", "apne boss", "aukaat", "tameez"
@@ -1555,7 +1515,6 @@ def generate_and_send_ai_reply_async(
     cl, tid, mid, sender_uname, text, media_label,
     media_b64, media_mime, time_tag, bot_own_replies
 ):
-    """Generates Gemini reply as Divya with special respect & apology protection for Boss alone.shayar.420!"""
     def _ai_worker():
         try:
             recent_context = "\n".join(list(CHAT_MEMORY_REF[tid])[-12:])
@@ -1563,7 +1522,6 @@ def generate_and_send_ai_reply_async(
             low_txt = (text or "").lower()
             is_main_boss = (sender_uname.lower() == MAIN_OWNER_ID.lower())
 
-            # SPECIAL PROTECTION FOR ALONE.SHAYAR.420 (RAVI BOSS): Never abuse back & apologize if scolded!
             if is_main_boss:
                 has_scold_or_abuse = any(w in low_txt for w in BOSS_SCOLD_TRIGGER_WORDS) or any(
                     re.search(rf"\b{re.escape(bw)}\b", low_txt) for bw in ABUSE_BLOCK_REACTION_WORDS
@@ -1613,7 +1571,6 @@ def run_main_bot_polling_loop(
         try:
             loop_counter += 1
 
-            # AUTO RAM CLEANER: Prevents Render 512MB RAM Out-Of-Memory Crash!
             if loop_counter % 600 == 0:
                 if len(processed_msg_ids) > 1500:
                     processed_msg_ids.clear()
@@ -1644,7 +1601,6 @@ def run_main_bot_polling_loop(
                 if tid not in CHAT_MEMORY_REF:
                     CHAT_MEMORY_REF[tid] = deque(maxlen=MEMORY_MAX_MESSAGES)
 
-                # 1. Check Left Members (Auto Re-Add & Roast) & Newly Added Members (Auto Welcome!)
                 if tid in group_members:
                     if ENABLE_AUTO_READD_LEFT_USERS:
                         left_members = group_members[tid] - current_ids
@@ -1685,7 +1641,6 @@ def run_main_bot_polling_loop(
                         continue
                     processed_msg_ids.add(mid)
 
-                    # 2. Check Action Logs for Left or Newly Added Users
                     if sender_id != bot_user_id and tid not in MUTED_THREADS:
                         if ENABLE_AUTO_READD_LEFT_USERS and check_if_user_left_action_log(msg):
                             if (tid, sender_id) not in KICKED_BY_BOT:
@@ -1710,17 +1665,14 @@ def run_main_bot_polling_loop(
 
                     is_owner = (sender_id == bot_user_id) or (sender_uname.lower() in [u.lower() for u in OWNER_USERNAMES])
 
-                    # 3. Execute Owner Commands (/tagall, /chup, /mode, /ping, etc.)
                     if is_owner and text.startswith("/"):
                         if handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=threads):
                             bot_own_replies.add(text)
                             continue
 
-                    # 4. Prevent Bot from Replying to its OWN Account's Messages (Except Owner accounts!)
                     if sender_id == bot_user_id or (text and text.strip() in bot_own_replies):
                         continue
 
-                    # 5. Individual User Mute Check (/chup @username)
                     if (tid, sender_uname.lower()) in CHUP_USERS and not is_owner:
                         mark_message_seen_async(cl, tid, mid)
                         chup_reply = generate_gemini_reply(
@@ -1733,7 +1685,6 @@ def run_main_bot_polling_loop(
                             send_reply_fast(cl, tid, mid, chup_reply)
                         continue
 
-                    # 6. Group Lock / Curfew Check
                     if tid in LOCKED_THREADS and not is_owner and (sender_uname.lower() not in VIP_USERS):
                         mark_message_seen_async(cl, tid, mid)
                         curfew_reply = generate_gemini_reply(
@@ -1744,7 +1695,6 @@ def run_main_bot_polling_loop(
                             send_reply_fast(cl, tid, mid, curfew_reply)
                         continue
 
-                    # 7. Anti-Link Check (Works on all links for non-VIPs)
                     if ENABLE_ANTI_LINK and not is_owner and (sender_uname.lower() not in VIP_USERS):
                         if message_has_any_link(msg, text):
                             mark_message_seen_async(cl, tid, mid)
@@ -1770,7 +1720,6 @@ def run_main_bot_polling_loop(
                                     send_reply_fast(cl, tid, mid, kick_ai)
                             continue
 
-                    # 8. Anti-Spam Check
                     if ENABLE_ANTI_SPAM and not is_owner and (sender_uname.lower() not in VIP_USERS):
                         if check_is_spamming(tid, sender_id):
                             mark_message_seen_async(cl, tid, mid)
@@ -1796,7 +1745,6 @@ def run_main_bot_polling_loop(
                                     send_reply_fast(cl, tid, mid, spam_kick_ai)
                             continue
 
-                    # 9. Public User Commands (/weather, /meaning, /news)
                     if text.startswith("/") and tid not in MUTED_THREADS:
                         if handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=is_owner):
                             bot_own_replies.add(text)
@@ -1853,7 +1801,6 @@ def run_main_bot_polling_loop(
         time.sleep(CHECK_INTERVAL)
 
 def immortal_bot_watchdog():
-    """SUPERVISOR WATCHDOG: Ensures start_instagram_bot NEVER stays dead!"""
     global BOT_RESTART_COUNT
     while True:
         try:
@@ -1865,7 +1812,6 @@ def immortal_bot_watchdog():
         time.sleep(8)
 
 def ensure_background_workers_started():
-    """Safely starts Watchdog & Keep-Alive Pinger exactly ONCE (even under Gunicorn!)."""
     global IS_BOT_WORKER_STARTED
     with BOT_BOOT_LOCK:
         if not IS_BOT_WORKER_STARTED:
@@ -1873,7 +1819,6 @@ def ensure_background_workers_started():
             threading.Thread(target=immortal_bot_watchdog, daemon=True).start()
             threading.Thread(target=keep_alive_pinger, daemon=True).start()
 
-# Start threads automatically on import/boot
 ensure_background_workers_started()
 
 if __name__ == "__main__":
