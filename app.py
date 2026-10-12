@@ -13,9 +13,7 @@ from urllib.parse import unquote
 from instagrapi import Client
 from flask import Flask, jsonify, request
 
-# ==========================================
-# CUSTOMIZABLE PARAMETERS (PART 1)
-# ==========================================
+PART_1_READY = True
 
 # 1. Owner Details (Fixed Tuple Bug -> Clean String + List for Safe Checking)
 OWNER_NAME = "Ravi, Ayush, Sonam"
@@ -37,7 +35,7 @@ DIRECT_GEMINI_KEY = NEW_GEMINI_KEY
 GEMINI_API_KEY = GEMINI_KEYS_LIST[0]
 INSTA_SESSION_ID = os.getenv("INSTA_SESSION_ID", "").strip()
 
-# 3. Your Live Render App URL
+# 3. Your Live Render App URL (24/7 Uptime Pinger)
 DEFAULT_RENDER_URL = "https://human-chat-bot.onrender.com"
 RENDER_EXTERNAL_URL = (os.getenv("RENDER_EXTERNAL_URL", "") or DEFAULT_RENDER_URL).strip()
 PING_INTERVAL_SECONDS = 180
@@ -110,6 +108,8 @@ CORE PERSONALITY RULES:
 
 BOT_PERSONA = DEFAULT_BOT_PERSONA
 ACTIVE_MODE_NAME = "Default Savage Divya"
+PART_1_END = True
+PART_2_READY = True
 http_session = requests.Session()
 MEMORY_SAVE_LOCK = threading.Lock()
 BOT_BOOT_LOCK = threading.Lock()
@@ -196,8 +196,7 @@ BOT_STATUS = {
 
 def load_persistent_memory():
     global VIP_USERS, USER_NICKNAMES
-    if not os.path.exists(MEMORY_FILE_PATH):
-        return
+    if not os.path.exists(MEMORY_FILE_PATH): return
     try:
         with open(MEMORY_FILE_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -211,8 +210,7 @@ def load_persistent_memory():
         BOT_STATUS["last_error"] = f"Memory Load Warning: {e}"
 
 def save_persistent_memory_async():
-    if MEMORY_SAVE_LOCK.locked():
-        return
+    if MEMORY_SAVE_LOCK.locked(): return
     def _save_worker():
         with MEMORY_SAVE_LOCK:
             try:
@@ -234,37 +232,29 @@ URL_REGEX = re.compile(
 )
 
 def contains_link(text):
-    if not text:
-        return False
+    if not text: return False
     return bool(URL_REGEX.search(str(text)))
 
 def message_has_any_link(msg, extracted_text=""):
-    if contains_link(extracted_text):
-        return True
+    if contains_link(extracted_text): return True
     item_type = str(getattr(msg, "item_type", "") or "").lower()
-    if item_type == "link":
-        return True
+    if item_type == "link": return True
     try:
         link_obj = getattr(msg, "link", None)
-        if link_obj:
-            return True
+        if link_obj: return True
         if hasattr(msg, "dict"):
             m_dict = msg.dict()
-            if m_dict.get("link") or m_dict.get("item_type") == "link":
-                return True
+            if m_dict.get("link") or m_dict.get("item_type") == "link": return True
             link_txt = str(m_dict.get("text") or "")
-            if contains_link(link_txt):
-                return True
+            if contains_link(link_txt): return True
             link_ctx = m_dict.get("link_context") or {}
-            if isinstance(link_ctx, dict) and link_ctx.get("link_url"):
-                return True
+            if isinstance(link_ctx, dict) and link_ctx.get("link_url"): return True
     except Exception:
         pass
     return False
 
 def check_is_spamming(tid, user_id):
-    if not ENABLE_ANTI_SPAM:
-        return False
+    if not ENABLE_ANTI_SPAM: return False
     now_t = time.time()
     key = (str(tid), str(user_id))
     if key not in SPAM_TIMESTAMPS:
@@ -277,6 +267,11 @@ def check_is_spamming(tid, user_id):
         dq.clear()
         return True
     return False
+
+PART_2_END = True
+
+PART_3_READY = True
+
 def kick_user_from_group(cl, thread_id, user_id):
     tid_str = str(thread_id)
     uid_str = str(user_id)
@@ -286,7 +281,6 @@ def kick_user_from_group(cl, thread_id, user_id):
             return True
     except Exception as e:
         BOT_STATUS["last_error"] = f"Kick M1: {e}"
-
     try:
         endpoint = f"direct_v2/threads/{tid_str}/remove_users/"
         data = {"user_ids": json.dumps([uid_str]), "_uuid": getattr(cl, "uuid", "")}
@@ -294,7 +288,6 @@ def kick_user_from_group(cl, thread_id, user_id):
         return True
     except Exception as e:
         BOT_STATUS["last_error"] = f"Kick M2: {e}"
-
     try:
         endpoint = f"direct_v2/threads/{tid_str}/remove_users/"
         data = {"user_ids": json.dumps([int(uid_str)]), "_uuid": getattr(cl, "uuid", "")}
@@ -313,7 +306,6 @@ def add_user_back_to_group(cl, thread_id, user_id):
             return True
     except Exception as e:
         BOT_STATUS["last_error"] = f"Re-Add M1: {e}"
-
     try:
         endpoint = f"direct_v2/threads/{tid_str}/add_user/"
         data = {"user_ids": json.dumps([uid_str]), "_uuid": getattr(cl, "uuid", "")}
@@ -321,7 +313,6 @@ def add_user_back_to_group(cl, thread_id, user_id):
         return True
     except Exception as e:
         BOT_STATUS["last_error"] = f"Re-Add M2: {e}"
-
     try:
         endpoint = f"direct_v2/threads/{tid_str}/add_user/"
         data = {"user_ids": json.dumps([int(uid_str)]), "_uuid": getattr(cl, "uuid", "")}
@@ -336,8 +327,7 @@ app = Flask(__name__)
 @app.route("/", methods=["GET", "HEAD"])
 def home():
     ensure_background_workers_started()
-    if request.method == "HEAD":
-        return "", 200
+    if request.method == "HEAD": return "", 200
     up_str, now_str = get_uptime_details()
     BOT_STATUS["running_uptime"] = up_str
     BOT_STATUS["live_mumbai_date_time"] = now_str
@@ -351,8 +341,7 @@ def home():
 @app.route("/ping", methods=["GET", "HEAD"])
 def ping():
     ensure_background_workers_started()
-    if request.method == "HEAD":
-        return "", 200
+    if request.method == "HEAD": return "", 200
     up_str, now_str = get_uptime_details()
     return jsonify({
         "ping": "Divya is Alive and Running 24/7! 🚀",
@@ -397,8 +386,7 @@ FORBIDDEN_LEAK_PHRASES = (
 )
 
 def mark_message_seen_async(cl, thread_id, message_id):
-    if not ENABLE_AUTO_SEEN:
-        return
+    if not ENABLE_AUTO_SEEN: return
     def _seen_worker():
         try:
             if hasattr(cl, "direct_message_seen"):
@@ -411,30 +399,21 @@ def mark_message_seen_async(cl, thread_id, message_id):
     threading.Thread(target=_seen_worker, daemon=True).start()
 
 def should_react_with_heart(text):
-    if not ENABLE_MESSAGE_REACTIONS or not text:
-        return False
+    if not ENABLE_MESSAGE_REACTIONS or not text: return False
     low_t = text.lower().strip()
-
     for bad_w in ABUSE_BLOCK_REACTION_WORDS:
-        if re.search(rf"\b{re.escape(bad_w)}\b", low_t):
-            return False
-
+        if re.search(rf"\b{re.escape(bad_w)}\b", low_t): return False
     owner_keywords = OWNER_NAMES_LIST + [MAIN_OWNER_ID.lower(), "owner", "boss", "creator"]
-    if any(okw in low_t for okw in owner_keywords):
-        return True
-
+    if any(okw in low_t for okw in owner_keywords): return True
     for pos_w in POSITIVE_REACTION_WORDS:
         if pos_w in ("❤️", "💖", "💕", "😍", "🥰", "😘", "🔥", "👑", "✨", "🌹"):
-            if pos_w in low_t:
-                return True
+            if pos_w in low_t: return True
         elif re.search(rf"\b{re.escape(pos_w)}\b", low_t):
             return True
-
     return False
 
 def react_heart_async(cl, thread_id, message_id):
-    if not ENABLE_MESSAGE_REACTIONS or not message_id:
-        return
+    if not ENABLE_MESSAGE_REACTIONS or not message_id: return
     def _heart_worker():
         time.sleep(0.05)
         endpoint = f"direct_v2/threads/{thread_id}/items/{message_id}/reactions/"
@@ -456,7 +435,11 @@ def react_heart_async(cl, thread_id, message_id):
             except Exception:
                 pass
     threading.Thread(target=_heart_worker, daemon=True).start()
-    # --- PART 4 START ---
+
+PART_3_END = True
+
+PART_4_READY = True
+
 def extract_media_for_gemini(msg):
     if not ENABLE_MULTIMODAL_MEDIA: return None, None, None
     item_type = str(getattr(msg, "item_type", "") or "").lower()
@@ -464,7 +447,6 @@ def extract_media_for_gemini(msg):
     media_url = None
     mime_type = None
     media_label = None
-
     try:
         voice_media = getattr(msg, "voice_media", None)
         if voice_media or item_type == "voice_media":
@@ -536,12 +518,10 @@ def extract_media_for_gemini(msg):
                 return b64_data, mime_type, media_label
     except Exception as e:
         BOT_STATUS["last_error"] = f"Media Extract Warning: {str(e)}"
-
     return None, None, None
 
 def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_tokens_override=None):
     global LOCKED_MODEL, GEMINI_API_KEY
-
     all_models = [
         "gemini-3.5-flash-lite",
         "gemini-2.5-flash-lite",
@@ -552,7 +532,6 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
         "gemini-1.5-flash-8b",
         "gemini-3.5-flash"
     ]
-    
     if LOCKED_MODEL:
         models_to_try = [LOCKED_MODEL] + [m for m in all_models if m != LOCKED_MODEL]
     else:
@@ -566,13 +545,11 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
         {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
         {"category": "HARM_CATEGORY_CIVIC_INTEGRITY", "threshold": "BLOCK_NONE"}
     ]
-    
     sys_instruction_text = (
         f"{BOT_PERSONA}\n"
         f"CRITICAL OUTPUT FORMAT: Write ONLY Divya's direct Hinglish chat reply in 1 super-short line (5-12 words). "
         f"NEVER mention 'the prompt', 'instructions', 'rules', or 'context'. Never explain your instructions."
     )
-
     parts_list = [{"text": prompt_text}]
     if media_b64 and media_mime:
         parts_list.append({
@@ -581,7 +558,6 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
                 "data": media_b64
             }
         })
-
     payload = {
         "system_instruction": {
             "parts": [{"text": sys_instruction_text}]
@@ -595,7 +571,6 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
     }
 
     keys_to_try = GEMINI_KEYS_LIST if "GEMINI_KEYS_LIST" in globals() else [GEMINI_API_KEY]
-
     for active_key in keys_to_try:
         for model_name in models_to_try:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={active_key}"
@@ -629,25 +604,20 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
                         break
             except Exception as e:
                 BOT_STATUS["last_error"] = str(e)
-
     return None
 
 def build_Wish_Message(greeting_title, theme_desc, thread_users):
     ist_now = get_mumbai_time()
     exact_time_str = ist_now.strftime("%I:%M %p IST")
     date_str = ist_now.strftime("%d %b %Y")
-
     shayari_prompt = (
         f"Write a fresh, unique, awesome 2-line Hindi/Urdu shayari in Hinglish for '{greeting_title}' "
         f"based on the theme: '{theme_desc}'. Do NOT mention any owner name. Just give the 2-line shayari."
     )
     shayari_text = generate_gemini_reply(shayari_prompt, max_tokens_override=120)
-    if not shayari_text:
-        return None
-
+    if not shayari_text: return None
     member_tags = " ".join([f"@{u.username}" for u in thread_users[:6] if getattr(u, "username", None)])
     tag_line = f"@everyone {member_tags}".strip()
-
     final_wish = (
         f"🌟 {greeting_title} 🌟\n"
         f"🕒 Mumbai Time: {exact_time_str} ({date_str})\n\n"
@@ -657,26 +627,18 @@ def build_Wish_Message(greeting_title, theme_desc, thread_users):
     return final_wish
 
 def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
-    if not ENABLE_AUTO_WISHER:
-        return
-
+    if not ENABLE_AUTO_WISHER: return
     ist_now = get_mumbai_time()
     current_hour = ist_now.hour
     current_minute = ist_now.minute
     today_str = ist_now.strftime("%Y-%m-%d")
-
     if current_hour in WISH_SCHEDULE and current_minute <= 10:
         greeting_title, theme_desc = WISH_SCHEDULE[current_hour]
-
         for thread in threads:
             tid = str(thread.id)
-            if tid in MUTED_THREADS:
-                continue
-
+            if tid in MUTED_THREADS: continue
             wish_key = (today_str, current_hour, tid)
-            if wish_key in SENT_WISHES_LOG:
-                continue
-
+            if wish_key in SENT_WISHES_LOG: continue
             try:
                 wish_msg = build_Wish_Message(greeting_title, theme_desc, thread.users)
                 if wish_msg:
@@ -686,17 +648,17 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
                     BOT_STATUS["last_wish_sent"] = f"{greeting_title} at {ist_now.strftime('%I:%M %p IST')} in {tid}"
             except Exception as e:
                 BOT_STATUS["last_error"] = f"Wish Send Warning: {e}"
-    OWNER_CMD_READY = True
+
+PART_4_END = True
+
+PART_5_READY = True
 
 def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
     global REPLY_TO_ALL_MESSAGES, BOT_PERSONA, ENABLE_AUTO_READD_LEFT_USERS
     cmd_text = text.strip()
     low_cmd = cmd_text.lower()
-    if not low_cmd.startswith("/"):
-        return False
-    if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads):
-        return True
-    
+    if not low_cmd.startswith("/"): return False
+    if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads): return True
     reply_msg = None
 
     if low_cmd == "/uptime":
@@ -824,7 +786,6 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
                 if str(t.id) == tid:
                     t_users = t.users
                     break
-
         if any(w in slot for w in ["morning", "morn", "subah", "gm"]):
             reply_msg = build_Wish_Message("Good Morning ☀️", "subah ki taaza kiran, naya josh aur dosti", t_users)
         elif any(w in slot for w in ["afternoon", "after", "dophar", "dopahar", "ga"]):
@@ -881,11 +842,9 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         if target_u:
             USER_WARNINGS[target_u] = 0
             for k in list(LINK_WARNINGS.keys()):
-                if k[1] == target_u:
-                    LINK_WARNINGS[k] = 0
+                if k[1] == target_u: LINK_WARNINGS[k] = 0
             for k in list(SPAM_WARNINGS.keys()):
-                if k[1] == target_u:
-                    SPAM_WARNINGS[k] = 0
+                if k[1] == target_u: SPAM_WARNINGS[k] = 0
             reply_msg = f"🕊️ @{target_u} ko maaf kar diya gaya hai! Saare warnings, link & spam strikes (0/3) hata diye gaye hain."
 
     elif low_cmd.startswith("/joke"):
@@ -988,9 +947,13 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         send_reply_fast(cl, tid, mid, reply_msg)
         BOT_STATUS["last_reply_sent"] = reply_msg
         return True
-
     return False
-    MODE_PRESETS = {
+
+PART_5_END = True
+
+PART_6_READY = True
+
+MODE_PRESETS = {
     "savage": ("Savage Destroyer 🔥", "Strictly talk like an ultra-savage, ruthless desi roaster girl. Keep replies 5-10 words."),
     "cute": ("Cute & Sweet Dost 🥰", "Strictly talk like a super cute, sweet, caring and bubbly desi best friend. Keep replies 5-10 words."),
     "shayar": ("Desi Shayar ✍️", "Reply to every message in deep, attitude or romantic shayari style in 1-2 short lines."),
@@ -1156,7 +1119,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
                     target_uid = str(u_info.pk)
                 except Exception:
                     target_uid = None
-
             if target_uid:
                 KICKED_BY_BOT.add((tid, target_uid))
                 if kick_user_from_group(cl, tid, target_uid):
@@ -1173,24 +1135,42 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         else:
             target_uid = None
             for u_id, u_name in GROUP_USER_NAMES.get(tid, {}).items():
-                if u_nadef handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False):
+                if u_name.lower() == target_u:
+                    target_uid = u_id
+                    break
+            if not target_uid:
+                try:
+                    u_info = cl.user_info_by_username(target_u)
+                    target_uid = str(u_info.pk)
+                except Exception:
+                    target_uid = None
+            if target_uid:
+                if add_user_back_to_group(cl, tid, target_uid):
+                    welcome_ai = generate_gemini_reply(f"New member @{target_u} joined! Welcome @{target_u} in 1 friendly Hinglish line.")
+                    reply_msg = welcome_ai if welcome_ai else f"✅ Done Boss! @{target_u} ko group mein add kar liya gaya hai! 🎉"
+                else:
+                    reply_msg = f"⚠️ @{target_u} ko add nahi kar paaya (Privacy setting ya follow issue ho sakta hai)."
+            else:
+                reply_msg = f"❌ Instagram par @{target_u} naam ka user nahi mila!"
+
+    if reply_msg:
+        send_reply_fast(cl, tid, mid, reply_msg)
+        BOT_STATUS["last_reply_sent"] = reply_msg
+        return True
+    return False
+
+def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False):
     cmd_text = text.strip()
     low_cmd = cmd_text.lower()
-
     public_prefixes = ("/weather", "/meaning", "/news")
-    if not low_cmd.startswith(public_prefixes):
-        return False
-
+    if not low_cmd.startswith(public_prefixes): return False
     u_key = sender_uname.lower()
     now_t = time.time()
     if not is_owner:
         last_used = PUBLIC_CMD_LAST_USED.get(u_key, 0)
-        if now_t - last_used < PUBLIC_CMD_COOLDOWN:
-            return True
+        if now_t - last_used < PUBLIC_CMD_COOLDOWN: return True
         PUBLIC_CMD_LAST_USED[u_key] = now_t
-
     reply_msg = None
-
     if low_cmd.startswith("/weather"):
         city = cmd_text[8:].strip() or "Mumbai"
         reply_msg = generate_gemini_reply(
@@ -1208,70 +1188,37 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         reply_msg = generate_gemini_reply(
             "Share 2 interesting trending desi news headlines in 2 short Hinglish lines with full swag! Do not mention owner."
         )
-
     if reply_msg:
         send_reply_fast(cl, tid, mid, reply_msg)
         BOT_STATUS["last_reply_sent"] = reply_msg
         return True
-
     return False
 
+PART_6_END = True
+
+PART_7_READY = True
 
 class RawObj:
     def __init__(self, d):
         self._d = d if isinstance(d, dict) else {}
-        for k, v in self._d.items():
-            setattr(self, k, v)
-    def dict(self):
-        return self._d
-me.lower() == target_u:
-                    target_uid = u_id
-                    break
-            if not target_uid:
-                try:
-                    u_info = cl.user_info_by_username(target_u)
-                    target_uid = str(u_info.pk)
-                except Exception:
-                    target_uid = None
-
-            if target_uid:
-                if add_user_back_to_group(cl, tid, target_uid):
-                    welcome_ai = generate_gemini_reply(f"New member @{target_u} joined! Welcome @{target_u} in 1 friendly Hinglish line.")
-                    reply_msg = welcome_ai if welcome_ai else f"✅ Done Boss! @{target_u} ko group mein add kar liya gaya hai! 🎉"
-                else:
-                    reply_msg = f"⚠️ @{target_u} ko add nahi kar paaya (Privacy setting ya follow issue ho sakta hai)."
-            else:
-                reply_msg = f"❌ Instagram par @{target_u} naam ka user nahi mila!"
-
-    if reply_msg:
-        send_reply_fast(cl, tid, mid, reply_msg)
-        BOT_STATUS["last_reply_sent"] = reply_msg
-        return True
-
-    return False
-
-
+        for k, v in self._d.items(): setattr(self, k, v)
+    def dict(self): return self._d
 
 def login_instagram_bulletproof(cl, raw_session_id):
     clean_sid = unquote(raw_session_id).strip()
     cl.delay_range = [0, 0]
-
     try:
         cl.private.cookies.set("sessionid", clean_sid, domain=".instagram.com")
         cl.private.cookies.set("sessionid", clean_sid)
     except Exception:
         pass
-
     extracted_uid = clean_sid.split(":")[0].strip() if ":" in clean_sid else ""
-
     try:
         cl.login_by_sessionid(clean_sid)
     except Exception as e:
         BOT_STATUS["last_error"] = f"Login 1404006 Bypassed Safely: {e}"
-
     bot_user_id = str(getattr(cl, "user_id", "") or extracted_uid)
     bot_username = str(getattr(cl, "username", "") or "")
-
     if not bot_user_id or not bot_username:
         try:
             res = cl.private_request("accounts/current_user/?edit=true")
@@ -1280,7 +1227,6 @@ def login_instagram_bulletproof(cl, raw_session_id):
             bot_username = str(user_data.get("username") or bot_username or "divya_bot")
         except Exception:
             bot_username = bot_username or "divya_bot"
-
     return bot_user_id, bot_username
 
 def fetch_threads_safe(cl, amount=3):
@@ -1296,18 +1242,15 @@ def fetch_threads_safe(cl, amount=3):
         )
         inbox_threads = raw_res.get("inbox", {}).get("threads", [])
         parsed_threads = []
-
         for rt in inbox_threads[:amount]:
             t_obj = RawObj(rt)
             t_obj.id = str(rt.get("thread_id") or rt.get("id") or "")
-
             users_list = []
             for u in rt.get("users", []):
                 u_obj = RawObj(u)
                 u_obj.pk = str(u.get("pk") or u.get("id") or "")
                 u_obj.username = str(u.get("username") or "user")
                 users_list.append(u_obj)
-
             inviter = rt.get("inviter")
             if isinstance(inviter, dict) and inviter.get("pk"):
                 inv_pk = str(inviter.get("pk"))
@@ -1316,9 +1259,7 @@ def fetch_threads_safe(cl, amount=3):
                     inv_obj.pk = inv_pk
                     inv_obj.username = str(inviter.get("username") or "user")
                     users_list.append(inv_obj)
-
             t_obj.users = users_list
-
             msgs_list = []
             for m in rt.get("items", []):
                 m_obj = RawObj(m)
@@ -1330,15 +1271,13 @@ def fetch_threads_safe(cl, amount=3):
                 msgs_list.append(m_obj)
             t_obj.messages = msgs_list
             parsed_threads.append(t_obj)
-
         return parsed_threads
     except Exception as raw_err:
         BOT_STATUS["last_error"] = f"Raw Inbox Warning: {raw_err}"
         return cl.direct_threads(amount=amount)
 
 def send_reply_fast(cl, tid, mid, final_reply):
-    if not final_reply:
-        return False
+    if not final_reply: return False
     try:
         token = str(random.randint(10**18, 10**19 - 1))
         data = {
@@ -1350,13 +1289,11 @@ def send_reply_fast(cl, tid, mid, final_reply):
             "text": str(final_reply),
             "_uuid": getattr(cl, "uuid", ""),
         }
-        if mid:
-            data["replied_to_item_id"] = str(mid)
+        if mid: data["replied_to_item_id"] = str(mid)
         cl.private_request("direct_v2/threads/broadcast/text/", data=cl.with_default_params(data))
         return True
     except Exception:
         pass
-
     try:
         token = str(random.randint(10**18, 10**19 - 1))
         data = {
@@ -1372,7 +1309,6 @@ def send_reply_fast(cl, tid, mid, final_reply):
         return True
     except Exception as e1:
         BOT_STATUS["last_error"] = f"Raw Send Warning: {e1}"
-
     try:
         cl.direct_send(final_reply, thread_ids=[int(tid)])
         return True
@@ -1384,21 +1320,16 @@ def extract_full_message_text(msg):
     try:
         for attr in ("text", "caption"):
             val = getattr(msg, attr, None)
-            if val:
-                return str(val).strip()
+            if val: return str(val).strip()
         link_obj = getattr(msg, "link", None)
         if isinstance(link_obj, dict):
-            if link_obj.get("text"):
-                return str(link_obj["text"]).strip()
+            if link_obj.get("text"): return str(link_obj["text"]).strip()
             l_ctx = link_obj.get("link_context")
-            if isinstance(l_ctx, dict) and l_ctx.get("link_url"):
-                return str(l_ctx["link_url"]).strip()
+            if isinstance(l_ctx, dict) and l_ctx.get("link_url"): return str(l_ctx["link_url"]).strip()
         if hasattr(msg, "dict"):
             md = msg.dict()
-            if md.get("text"):
-                return str(md["text"]).strip()
-            if isinstance(md.get("link"), dict) and md["link"].get("text"):
-                return str(md["link"]["text"]).strip()
+            if md.get("text"): return str(md["text"]).strip()
+            if isinstance(md.get("link"), dict) and md["link"].get("text"): return str(md["link"]["text"]).strip()
     except Exception:
         pass
     return ""
@@ -1408,8 +1339,7 @@ def check_if_user_left_action_log(msg):
         if str(getattr(msg, "item_type", "") or "").lower() == "action_log":
             al = getattr(msg, "action_log", {})
             desc = str(al.get("description", "") if isinstance(al, dict) else getattr(al, "description", "")).lower()
-            if "left the group" in desc or "left the chat" in desc:
-                return True
+            if "left the group" in desc or "left the chat" in desc: return True
     except Exception:
         pass
     return False
@@ -1420,8 +1350,7 @@ def check_if_user_added_action_log(msg):
             al = getattr(msg, "action_log", {})
             desc = str(al.get("description", "") if isinstance(al, dict) else getattr(al, "description", ""))
             low_d = desc.lower()
-            if "added " in low_d or "joined the group" in low_d or "joined the chat" in low_d:
-                return desc
+            if "added " in low_d or "joined the group" in low_d or "joined the chat" in low_d: return desc
     except Exception:
         pass
     return None
@@ -1462,7 +1391,6 @@ def start_instagram_bot():
         BOT_STATUS["state"] = "Error: INSTA_SESSION_ID is empty!"
         time.sleep(30)
         return
-
     load_persistent_memory()
     cl = Client()
     try:
@@ -1472,9 +1400,7 @@ def start_instagram_bot():
         BOT_STATUS["state"] = f"Login Failed (Retrying in 25s): {e}"
         time.sleep(25)
         return
-
     generate_gemini_reply("Hello Divya")
-
     processed_msg_ids = set()
     recently_readded = {}
     recently_welcomed = {}
@@ -1482,7 +1408,6 @@ def start_instagram_bot():
     group_members = {}
     consecutive_errors = 0
     loop_counter = 0
-
     try:
         init_threads = fetch_threads_safe(cl, amount=ACTIVE_THREADS_TO_SCAN)
         for t in init_threads:
@@ -1497,14 +1422,18 @@ def start_instagram_bot():
         save_persistent_memory_async()
     except Exception as e:
         BOT_STATUS["last_error"] = f"Init Scan Warning: {e}"
-
     BOT_STATUS["state"] = "Divya Running 24/7 at 0.5s ROCKET SPEED (100% Pure Gemini AI) 🚀"
     run_main_bot_polling_loop(
         cl, bot_user_id, bot_username, processed_msg_ids,
         recently_readded, recently_welcomed, bot_own_replies, group_members,
         consecutive_errors, loop_counter
-)
-                BOSS_SCOLD_TRIGGER_WORDS = (
+    )
+
+PART_7_END = True
+
+PART_8_READY = True
+
+BOSS_SCOLD_TRIGGER_WORDS = (
     "batmiji", "badtameezi", "badtamizi", "bhool gayi", "bhul gayi", "bhool gyi",
     "bhul gyi", "banane wale", "ravi ko gaali", "mujhse", "mujhe roast", "mujhe gaali",
     "apne malik", "apne boss", "aukaat", "tameez"
@@ -1558,7 +1487,6 @@ def generate_and_send_ai_reply_async(
                 react_heart_async(cl, tid, mid)
         except Exception as e:
             BOT_STATUS["last_error"] = f"Async Reply Error: {e}"
-
     threading.Thread(target=_ai_worker, daemon=True).start()
 
 def run_main_bot_polling_loop(
@@ -1569,14 +1497,10 @@ def run_main_bot_polling_loop(
     while True:
         try:
             loop_counter += 1
-
             if loop_counter % 600 == 0:
-                if len(processed_msg_ids) > 1500:
-                    processed_msg_ids.clear()
-                if len(bot_own_replies) > 500:
-                    bot_own_replies.clear()
-                if len(SENT_WISHES_LOG) > 300:
-                    SENT_WISHES_LOG.clear()
+                if len(processed_msg_ids) > 1500: processed_msg_ids.clear()
+                if len(bot_own_replies) > 500: bot_own_replies.clear()
+                if len(SENT_WISHES_LOG) > 300: SENT_WISHES_LOG.clear()
                 gc.collect()
 
             threads = fetch_threads_safe(cl, amount=ACTIVE_THREADS_TO_SCAN)
@@ -1593,8 +1517,7 @@ def run_main_bot_polling_loop(
                 user_map = {str(u.pk): u.username for u in thread.users}
                 current_ids = set(user_map.keys())
 
-                if tid not in GROUP_USER_NAMES:
-                    GROUP_USER_NAMES[tid] = {}
+                if tid not in GROUP_USER_NAMES: GROUP_USER_NAMES[tid] = {}
                 GROUP_USER_NAMES[tid].update(user_map)
 
                 if tid not in CHAT_MEMORY_REF:
@@ -1604,8 +1527,7 @@ def run_main_bot_polling_loop(
                     if ENABLE_AUTO_READD_LEFT_USERS:
                         left_members = group_members[tid] - current_ids
                         for left_uid in left_members:
-                            if left_uid == bot_user_id or tid in MUTED_THREADS:
-                                continue
+                            if left_uid == bot_user_id or tid in MUTED_THREADS: continue
                             if (tid, left_uid) in KICKED_BY_BOT:
                                 KICKED_BY_BOT.discard((tid, left_uid))
                                 continue
@@ -1617,27 +1539,21 @@ def run_main_bot_polling_loop(
                     if ENABLE_AUTO_WELCOME_NEW_USERS and tid not in MUTED_THREADS:
                         joined_members = current_ids - group_members[tid]
                         for new_uid in joined_members:
-                            if new_uid == bot_user_id:
-                                continue
-                            if time.time() - recently_readded.get((tid, new_uid), 0) < 30:
-                                continue
+                            if new_uid == bot_user_id: continue
+                            if time.time() - recently_readded.get((tid, new_uid), 0) < 30: continue
                             if time.time() - recently_welcomed.get((tid, new_uid), 0) > 30:
                                 recently_welcomed[(tid, new_uid)] = time.time()
                                 new_uname = user_map.get(new_uid, "dost")
                                 trigger_welcome_new_user(cl, tid, new_uname, bot_own_replies)
 
                 group_members[tid] = current_ids
-
                 messages = thread.messages
-                if not messages:
-                    continue
+                if not messages: continue
 
                 for msg in reversed(messages[:4]):
                     mid = str(msg.id)
                     sender_id = str(msg.user_id)
-
-                    if mid in processed_msg_ids:
-                        continue
+                    if mid in processed_msg_ids: continue
                     processed_msg_ids.add(mid)
 
                     if sender_id != bot_user_id and tid not in MUTED_THREADS:
@@ -1750,21 +1666,17 @@ def run_main_bot_polling_loop(
                             continue
 
                     media_b64, media_mime, media_label = extract_media_for_gemini(msg)
-                    if not text and not media_b64:
-                        continue
+                    if not text and not media_b64: continue
 
                     mark_message_seen_async(cl, tid, mid)
-                    if tid in MUTED_THREADS:
-                        continue
+                    if tid in MUTED_THREADS: continue
 
                     MESSAGE_COUNTER[sender_uname] += 1
-
                     time_tag = get_mumbai_time().strftime("%d %b %I:%M %p")
                     CHAT_MEMORY_REF[tid].append(f"[{time_tag}] @{sender_uname}: {text if text else f'[{media_label}]'}")
                     save_persistent_memory_async()
 
                     low_txt = text.lower()
-
                     if AFK_STATE["is_afk"] and not is_owner and any(k in low_txt for k in [MAIN_OWNER_ID.lower()] + OWNER_NAMES_LIST):
                         afk_ai = generate_gemini_reply(
                             f"@{sender_uname} mentioned Boss Ravi, who is busy ({AFK_STATE['reason']}). Tell @{sender_uname} in 1 cool Hinglish line to talk to Divya instead."
@@ -1778,7 +1690,6 @@ def run_main_bot_polling_loop(
 
                     asked_about_owner = any(kw in low_txt for kw in ["owner", "creator", "boss", "kisne banaya", "kaun banaya", MAIN_OWNER_ID.lower()] + OWNER_NAMES_LIST)
                     locked_target = TARGETED_USERS.get(tid)
-                    
                     if locked_target:
                         should_reply = (sender_uname.lower() == locked_target) or (TRIGGER_WORD.lower() in low_txt) or asked_about_owner
                     else:
@@ -1789,14 +1700,11 @@ def run_main_bot_polling_loop(
                             cl, tid, mid, sender_uname, text, media_label,
                             media_b64, media_mime, time_tag, bot_own_replies
                         )
-
         except Exception as e:
             consecutive_errors += 1
             BOT_STATUS["last_error"] = f"Loop Error: {e}"
             time.sleep(2)
-            if consecutive_errors >= 25:
-                return
-
+            if consecutive_errors >= 25: return
         time.sleep(CHECK_INTERVAL)
 
 def immortal_bot_watchdog():
@@ -1823,3 +1731,5 @@ ensure_background_workers_started()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port, threaded=True)
+
+
