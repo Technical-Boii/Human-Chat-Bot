@@ -456,14 +456,11 @@ def react_heart_async(cl, thread_id, message_id):
             except Exception:
                 pass
     threading.Thread(target=_heart_worker, daemon=True).start()
-    def extract_media_for_gemini(msg):
-        if not ENABLE_MULTIMODAL_MEDIA:
-        return None, None, None
-
+    # --- PART 4 START ---
+def extract_media_for_gemini(msg):
+    if not ENABLE_MULTIMODAL_MEDIA: return None, None, None
     item_type = str(getattr(msg, "item_type", "") or "").lower()
-    if item_type in ("text", "action_log", "link"):
-        return None, None, None
-
+    if item_type in ("text", "action_log", "link"): return None, None, None
     media_url = None
     mime_type = None
     media_label = None
