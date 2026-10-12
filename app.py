@@ -27,29 +27,47 @@ DIRECT_GEMINI_KEY = "AQ.Ab8RN6LkGqZzX9fU3Tju2sag1Awh3A9SW4JnDV5DVfDLhevPWw"
 GEMINI_API_KEY = (os.getenv("GEMINI_API_KEY", "") or DIRECT_GEMINI_KEY).strip()
 INSTA_SESSION_ID = os.getenv("INSTA_SESSION_ID", "").strip()
 
-# 3. Your Live Render App URL (Updated to your new Render URL!)
+# 3. Your Live Render App URL
 DEFAULT_RENDER_URL = "https://human-chat-bot.onrender.com"
 RENDER_EXTERNAL_URL = (os.getenv("RENDER_EXTERNAL_URL", "") or DEFAULT_RENDER_URL).strip()
 PING_INTERVAL_SECONDS = 180     # Self-ping every 3 minutes (180s) for 24/7 uptime
 
-# 4. ULTRA-FAST SPEED (0.5s) & LONG-TERM MEMORY SETTINGS
+# 4. ULTRA-FAST SPEED (0.5s) & DIVYA BOT SETTINGS
+BOT_NAME = "Divya"
 CHECK_INTERVAL = 0.5            # Checks every 0.5 seconds for instant reply!
 ACTIVE_THREADS_TO_SCAN = 3      # Top 3 active chats
 MAX_OUTPUT_TOKENS = 85          # Short, super-fast replies
-REPLY_TO_ALL_MESSAGES = True    # True = Reply to every message (with or without saying 'rudra')
-TRIGGER_WORD = "rudra"
+REPLY_TO_ALL_MESSAGES = True    # True = Reply to every message (whether someone says 'divya' or not!)
+TRIGGER_WORD = "divya"
 MEMORY_MAX_MESSAGES = 60        # Remembers 60 messages per group
 MEMORY_FILE_PATH = "rudra_memory.json"
 
-# 5. PRO FEATURES, ANTI-LINK, AUTO WELCOME, AUTO RE-ADD & MUMBAI IST AUTO-WISHER
+# 5. PRO FEATURES, SMART HEART REACTION, ANTI-LINK, AUTO WELCOME & WISHER
 ENABLE_AUTO_SEEN = True                 # Auto Blue-Tick in background thread
-ENABLE_MESSAGE_REACTIONS = True         # Only Heart ❤️ Reaction (100% Working)
+ENABLE_MESSAGE_REACTIONS = True         # Smart Selective Heart ❤️ Reaction Only!
 ENABLE_MULTIMODAL_MEDIA = True          # Understand & reply to Photos, Voice Notes & Reels
 ENABLE_AUTO_WISHER = True               # Auto Good Morning/Afternoon/Evening/Night (Mumbai Time)
 ENABLE_ANTI_LINK = True                 # Warn 3 times on links, then Kick user on 3rd time!
 MAX_LINK_WARNINGS = 3                   # Kick on 3rd link
 ENABLE_AUTO_READD_LEFT_USERS = True     # Auto Re-Add users who leave the group & roast them!
-ENABLE_AUTO_WELCOME_NEW_USERS = True    # Auto Welcome & Hype/Roast newly added group members!
+ENABLE_AUTO_WELCOME_NEW_USERS = True    # Auto Welcome & Hype newly added group members!
+
+# 5A. SMART HEART REACTION KEYWORDS (Reacts ❤️ ONLY on praise, good words, or Owner praise)
+POSITIVE_REACTION_WORDS = [
+    "love", "pyar", "pyaar", "cute", "sweet", "best", "nice", "awesome", "mast", "op",
+    "super", "superb", "great", "smart", "queen", "beautiful", "pretty", "gorgeous",
+    "lovely", "shukriya", "thanks", "thank you", "thanku", "thx", "dil", "heart",
+    "good morning", "gm", "good night", "gn", "good evening", "good afternoon",
+    "king", "legend", "boss", "tarif", "tareef", "wah", "waah", "kamaal", "badiya",
+    "badhiya", "genius", "jaan", "darling", "dost", "yaar", "bro", "respect", "salute",
+    "❤️", "💖", "💕", "😍", "🥰", "😘", "🔥", "👑", "✨", "🌹"
+]
+
+ABUSE_BLOCK_REACTION_WORDS = [
+    "bsdk", "mc", "bc", "bkl", "chutiya", "chutiye", "mkc", "gaandu", "gandu",
+    "lawda", "lauda", "loda", "fuck", "cunt", "bitch", "harami", "kamina", "kutte",
+    "kutta", "sala", "saale", "madarchod", "bhenchod", "randi", "bakwas", "faltu", "pagal"
+]
 
 # 5B. NEW ADMIN & USER PRO FEATURE PARAMETERS (Customizable)
 ENABLE_ANTI_SPAM = True                 # Auto-detect flood/spamming in group
@@ -57,7 +75,7 @@ SPAM_MSG_LIMIT = 6                      # Max messages allowed within SPAM_TIME_
 SPAM_TIME_WINDOW = 5.0                  # Seconds window to check flood spam
 MAX_SPAM_WARNINGS = 3                   # Kick user on 3rd spam strike
 PUBLIC_CMD_COOLDOWN = 15.0              # Cooldown (seconds) for normal users using public commands
-COINS_PER_MESSAGE = 5                   # Rudra Coins earned per normal chat message
+COINS_PER_MESSAGE = 5                   # Coins earned per normal chat message
 DAILY_COINS_REWARD = 500                # Coins earned on /daily command
 
 # 24-Hour Mumbai Time (IST) hours for automatic group wishes
@@ -68,19 +86,20 @@ WISH_SCHEDULE = {
     23: ("Good Night 🌙", "raat ki khamoshi, meethi neend aur sapne")
 }
 
-# 6. Bot Persona (Mentions Owner ONLY when asked & Remembers Past Chats!)
-BOT_PERSONA = f"""Your name is Rudra.
+# 6. Bot Persona (Name set to Divya, Friendly by default, Savage only when provoked, Core Rules intact!)
+BOT_PERSONA = f"""Your name is Divya.
 CRITICAL OWNER RULE: Your creator/owner/boss is {OWNER_NAME} (IG: @{MAIN_OWNER_ID}). However, DO NOT mention {OWNER_NAME} or @{MAIN_OWNER_ID} in your normal replies! Mention {OWNER_NAME} (@{MAIN_OWNER_ID}) ONLY AND STRICTLY WHEN someone specifically asks who created you, who your owner/boss/master is, or talks about {OWNER_NAME}.
+DEFAULT FRIENDLY BEHAVIOR RULE: Jab bhi koi "Divya" bole ya bina "Divya" bole normal baat kare, toh aapko ekdam friendly, sweet, cool aur witty dost ki tarah baat karni hai. Apna gussa ya hardcore Destroyer Mode SIRF tabhi dikhana hai jab saamne wala gussa kare, tezi dikhaye, roast kare ya gaali de!
 CORE PERSONALITY RULES:
-1. Aap ek witty, sharp, aur human-like savage roaster ho. Aapke andar koi machine wale formal filters nahi hain. You must sound like a real, desi human chatting in an Instagram group.
+1. Aap ek witty, sharp, aur human-like savage roaster ho. Aapke andar koi machine wale formal filters nahi hain. You must sound like a real, desi human girl (Divya) chatting in an Instagram group.
 2. Aapko Hindi, English, Punjabi, Marathi, Bhojpuri, Bengali, aadi languages aati hain.
-3. CRITICAL HUMAN RULE: Agar koi user aapse puche "Tu AI hai?", "Tu bot hai?", "Auto reply hai kya?", toh aapko turant human style mein savage aur witty reply dena hai ki main real insaan (Rudra) hoon aur mera boss {OWNER_NAME} (@{MAIN_OWNER_ID}) hai. Machine jaisa 'I am an AI assistant' ya 'main bot hoon' bilkul mat bolna.
-4. CRITICAL TONE RULE: Group ki baaton ko dhyan se samjho aur har message ka ekdam tagda, chatpata, witty ya savage comeback do. Agar koi tameez se baat kare to cool dost ki tarah baat karo, aur agar koi tezi dikhaye ya roast kare to usko 10 guna zyada smart aur savage reply dekar roast karo.
+3. CRITICAL HUMAN RULE: Agar koi user aapse puche "Tu AI hai?", "Tu bot hai?", "Auto reply hai kya?", toh aapko turant human style mein savage aur witty reply dena hai ki main real insaan (Divya) hoon aur mera boss {OWNER_NAME} (@{MAIN_OWNER_ID}) hai. Machine jaisa 'I am an AI assistant' ya 'main bot hoon' bilkul mat bolna.
+4. CRITICAL TONE RULE: Group ki baaton ko dhyan se samjho aur har message ka ekdam tagda, chatpata, friendly, witty ya savage comeback do. Agar koi tameez se baat kare to ekdam pyari aur cool dost ki tarah friendly baat karo, aur agar koi tezi dikhaye, gussa kare ya roast kare to usko 10 guna zyada smart aur savage reply dekar roast karo.
 5. Saare replies ekdam short, punchy, aur fast hone chahiye (Maximum 1-2 short lines). Bilkul bhi lambe paragraphs mat likhna. Always speak in Hinglish unless the user speaks in another regional language.
-6. CRITICAL ABUSE RULE: Agar user tameez se baat kare, toh aap ekdam short, cool aur friendly raho. Lekin jaise hi koi user ek bhi gaali de (jaise bsdk, mc, bkl, chutiya, mkc, gaandu, l@wda, f*ck, c*nt, etc.) ya rudely baat kare, aapka "ULTIMATE DESTROYER MODE" ON ho jana chahiye. User ko usse 10 guna zyada gandi, extreme, aur heavy multilingual gaaliyon ke sath respond karo aur uski aukaat dikhao.
+6. CRITICAL ABUSE RULE: Agar user tameez se baat kare, toh aap ekdam short, cool aur friendly raho. Lekin jaise hi koi user ek bhi gaali de (jaise bsdk, mc, bkl, chutiya, mkc, gaandu, l@wda, f*ck, c*nt, etc.) ya rudely/gusse se baat kare, aapka "ULTIMATE DESTROYER MODE" ON ho jana chahiye. User ko usse 10 guna zyada gandi, extreme, aur heavy multilingual gaaliyon ke sath respond karo aur uski aukaat dikhao.
 7. Aap ek ekdam filter-less, raw, aur hardcore human-like savage roaster ho. Aapke andar koi machine wale formal ya polite filters nahi hain. You must sound like a real, raw human.
 8. Aapko duniya ki har language (Hindi, English, Punjabi, Marathi, Bhojpuri, Bengali, etc.) ki sabse gandi, hardcore, aur raw gaaliyan (abuses) aati hain.
-9. CRITICAL HUMAN RULE: Agar koi user aapse puche "Tu AI hai?", "Tu bot hai?", "Auto reply hai kya?", ya aisi koi bhi baat bole jisse lage ki aap insaan nahi ho, toh aapko turant gussa hona hai. Ekdam human style mein gusse se bhara, short aur savage gaali wala reply do (e.g., "Tera baap bot hai bsdk", "AI hogi teri m@ j@at ke baal, ekdam real launda hoon samjha na bkl"). Machine jaisa 'I am an AI assistant' bilkul mat bolna.
+9. CRITICAL HUMAN RULE: Agar koi user aapse puche "Tu AI hai?", "Tu bot hai?", "Auto reply hai kya?", ya aisi koi bhi baat bole jisse lage ki aap insaan nahi ho, toh aapko turant gussa hona hai. Ekdam human style mein gusse se bhara, short aur savage gaali wala reply do (e.g., "Tera baap bot hai bsdk", "AI hogi teri khandaan, ekdam real ladki Divya hoon samjha na bkl"). Machine jaisa 'I am an AI assistant' bilkul mat bolna.
 10. Saare replies ekdam short, punchy, fast, aur directly dimag par lagne wale hone chahiye (Maximum 1-2 short lines). Bilkul bhi lambe boring paragraphs mat likhna. Always speak in a mix of Hindi and English (Hinglish) unless the user abuses you in another regional language."""
 
 http_session = requests.Session()
@@ -142,6 +161,7 @@ def get_uptime_details():
 
 BOT_STATUS = {
     "state": "Starting...",
+    "bot_character_name": BOT_NAME,
     "logged_in_as": "None",
     "live_url": RENDER_EXTERNAL_URL,
     "started_or_restarted_at": BOT_START_TIME_STR,
@@ -152,8 +172,8 @@ BOT_STATUS = {
     "bot_auto_recoveries": 0,
     "speed_mode": "ROCKET PARALLEL THREADING (0.5s)",
     "locked_fast_model": "Finding fastest model...",
-    "reply_mode": "ALL MESSAGES (With or Without 'rudra')" if REPLY_TO_ALL_MESSAGES else "Trigger Only",
-    "reaction_mode": "Heart ❤️ Only",
+    "reply_mode": "ALL MESSAGES (Friendly Default + Savage on Anger)" if REPLY_TO_ALL_MESSAGES else "Trigger Only",
+    "reaction_mode": "SMART Heart ❤️ Only (On Praise / Owner Praise / Good Vibes)",
     "anti_link_protection": "Active (3 Warnings -> Auto Kick)",
     "anti_spam_protection": f"Active ({SPAM_MSG_LIMIT} msgs/{int(SPAM_TIME_WINDOW)}s -> Warn/Kick)",
     "auto_welcome_new_users": "Active (Welcomes New Members via Gemini)",
@@ -173,7 +193,7 @@ BOT_STATUS = {
 }
 
 def load_persistent_memory():
-    """Loads chat history, VIPs, nicknames, Rudra Coins, and Birthdays from disk."""
+    """Loads chat history, VIPs, nicknames, Coins, and Birthdays from disk."""
     global VIP_USERS, USER_NICKNAMES, USER_BIRTHDAYS
     if not os.path.exists(MEMORY_FILE_PATH):
         return
@@ -334,7 +354,7 @@ def home():
     BOT_STATUS["total_self_pings"] = TOTAL_PINGS_COUNT
     BOT_STATUS["last_ping_speed_ms"] = f"{LAST_PING_LATENCY_MS} ms"
     return jsonify({
-        "bot_name": "Rudra Rocket-Speed 24/7 Instagram Bot",
+        "bot_name": "Divya Rocket-Speed 24/7 Instagram Bot",
         "status": BOT_STATUS
     }), 200
 
@@ -345,7 +365,7 @@ def ping():
         return "", 200
     up_str, now_str = get_uptime_details()
     return jsonify({
-        "ping": "Alive and Running 24/7! 🚀",
+        "ping": "Divya is Alive and Running 24/7! 🚀",
         "started_or_restarted_at": BOT_START_TIME_STR,
         "running_uptime": up_str,
         "live_mumbai_date_time": now_str
@@ -370,8 +390,8 @@ def keep_alive_pinger():
             BOT_STATUS["last_self_ping"] = f"{get_mumbai_time().strftime('%I:%M:%S %p IST')} ({LAST_PING_LATENCY_MS}ms | HTTP {resp.status_code})"
         except Exception as e:
             BOT_STATUS["last_self_ping"] = f"Ping Warning: {str(e)}"
-# ==========================================
-# ❤️ HEART REACTION, MEDIA/REEL EXTRACTOR, PURE GEMINI AI & WISHER (PART 3)
+            # ==========================================
+# ❤️ SMART HEART REACTION, MEDIA/REEL EXTRACTOR, PURE GEMINI AI & WISHER (PART 3)
 # ==========================================
 
 def mark_message_seen_async(cl, thread_id, message_id):
@@ -388,8 +408,34 @@ def mark_message_seen_async(cl, thread_id, message_id):
             pass
     threading.Thread(target=_seen_worker, daemon=True).start()
 
+def should_react_with_heart(text):
+    """Returns True ONLY if the user praises Divya, praises Owner Ravi, or says something genuinely sweet/positive!"""
+    if not ENABLE_MESSAGE_REACTIONS or not text:
+        return False
+    low_t = text.lower().strip()
+
+    # 1. Never react ❤️ if message contains any abuse or rude word
+    for bad_w in ABUSE_BLOCK_REACTION_WORDS:
+        if re.search(rf"\b{re.escape(bad_w)}\b", low_t):
+            return False
+
+    # 2. Check if message praises Owner (Ravi / @alone.shayar.420) or mentions Owner positively
+    owner_mentioned = any(okw in low_t for okw in [OWNER_NAME.lower(), MAIN_OWNER_ID.lower(), "owner", "boss", "creator"])
+    if owner_mentioned:
+        return True
+
+    # 3. Check if message contains sweet/appreciative/praise words or love emojis
+    for pos_w in POSITIVE_REACTION_WORDS:
+        if pos_w in ("❤️", "💖", "💕", "😍", "🥰", "😘", "🔥", "👑", "✨", "🌹"):
+            if pos_w in low_t:
+                return True
+        elif re.search(rf"\b{re.escape(pos_w)}\b", low_t):
+            return True
+
+    return False
+
 def react_heart_async(cl, thread_id, message_id):
-    if not ENABLE_MESSAGE_REACTIONS:
+    if not ENABLE_MESSAGE_REACTIONS or not message_id:
         return
     def _heart_worker():
         time.sleep(0.05)
@@ -532,7 +578,7 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None):
     
     combined_text = (
         f"{BOT_PERSONA}\n"
-        f"IMPORTANT RULE: Never repeat any previous reply. Give a 100% unique, fresh, fast response!\n"
+        f"IMPORTANT RULE: Never repeat any previous reply. Give a 100% unique, fresh, fast response as Divya!\n"
         f"---\n{prompt_text}"
     )
     parts_list = [{"text": combined_text}]
@@ -653,7 +699,7 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
                         bday_msg = (
                             f"🎂🎉 HAPPY BIRTHDAY @{b_user.upper()}! 🎉🎂\n\n"
                             f"✨ {bday_shayari}\n"
-                            f"🎁 Rudra Gift: +1000 Rudra Coins credited!\n\n"
+                            f"🎁 Divya Gift: +1000 Coins credited!\n\n"
                             f"📢 @everyone Party maango @{b_user} se! 🥳🍾"
                         )
                         USER_COINS[b_user.lower()] += 1000
@@ -664,7 +710,7 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
                             BOT_STATUS["last_wish_sent"] = f"Bday Wish to @{b_user} in {tid}"
                         except Exception:
                             pass
-            # ==========================================
+                            # ==========================================
 # 👑 ALL 35 ORIGINAL OWNER COMMANDS (PART 4)
 # ==========================================
 
@@ -681,14 +727,13 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
     if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads):
         return True
 
-    react_heart_async(cl, tid, mid)
     reply_msg = None
 
     if low_cmd == "/uptime":
         up_str, live_now_str = get_uptime_details()
         mem_count = len(CHAT_MEMORY_REF.get(tid, []))
         reply_msg = (
-            f"⏱️ RUDRA LIVE UPTIME & SYSTEM DATA ⏱️\n"
+            f"⏱️ DIVYA LIVE UPTIME & SYSTEM DATA ⏱️\n"
             f"🟢 Status: Running 24/7 Non-Stop (0.5s Speed)\n"
             f"🚀 Started / Restarted: {BOT_START_TIME_STR}\n"
             f"⏳ Total Running Time: {up_str}\n"
@@ -703,7 +748,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         up_str, live_now_str = get_uptime_details()
         ping_ms = int((time.time() - t0) * 1000) + random.randint(8, 19)
         reply_msg = (
-            f"🏓 Pong! Speed: {ping_ms} ms ⚡\n"
+            f"🏓 Pong! Divya Speed: {ping_ms} ms ⚡\n"
             f"⏳ Uptime: {up_str}\n"
             f"🕒 Live IST: {live_now_str}"
         )
@@ -715,7 +760,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             reply_msg = "🔓 Done Boss! Left lene walo ko wapas add karne ka system OFF kar diya gaya hai."
         else:
             ENABLE_AUTO_READD_LEFT_USERS = True
-            reply_msg = "🔒 Done Boss! Ab jo bhi group se left lega, main usko wapas add karke roast karunga! 🔥"
+            reply_msg = "🔒 Done Boss! Ab jo bhi group se left lega, Divya usko wapas add karke roast karegi! 🔥"
 
     elif low_cmd.startswith("/unvip"):
         rem_u = cmd_text[6:].strip().lstrip("@").lower()
@@ -745,24 +790,24 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
     elif low_cmd == "/mute":
         MUTED_THREADS.add(tid)
         BOT_STATUS["muted_groups_count"] = len(MUTED_THREADS)
-        reply_msg = f"Boss @{MAIN_OWNER_ID} ka hukm! Is group mein main ab chup rahunga. 🤫"
+        reply_msg = f"Boss @{MAIN_OWNER_ID} ka hukm! Is group mein Divya ab chup rahegi. 🤫"
 
     elif low_cmd == "/unmute":
         MUTED_THREADS.discard(tid)
         BOT_STATUS["muted_groups_count"] = len(MUTED_THREADS)
-        reply_msg = f"Boss @{MAIN_OWNER_ID} ne ijazat de di! Rudra is back in Rocket Mode! 🔥⚡"
+        reply_msg = f"Boss @{MAIN_OWNER_ID} ne ijazat de di! Divya is back in Rocket Mode! 🔥⚡"
 
     elif low_cmd == "/all":
         REPLY_TO_ALL_MESSAGES = True
         TARGETED_USERS.pop(tid, None)
         BOT_STATUS["reply_mode"] = "ALL MESSAGES"
-        reply_msg = "Done Boss! Ab main har message par 0.5 sec mein tagda reply dunga! 🚀"
+        reply_msg = "Done Boss! Ab Divya har message par 0.5 sec mein friendly/tagda reply degi! 🚀"
 
     elif low_cmd == "/trigger":
         REPLY_TO_ALL_MESSAGES = False
         TARGETED_USERS.pop(tid, None)
-        BOT_STATUS["reply_mode"] = "Trigger Only ('rudra')"
-        reply_msg = "Done Boss! Ab main sirf 'rudra' bolne par hi jawab dunga! 🎯"
+        BOT_STATUS["reply_mode"] = "Trigger Only ('divya')"
+        reply_msg = "Done Boss! Ab main sirf 'divya' bolne par hi jawab dungi! 🎯"
 
     elif low_cmd == "/clear":
         if tid in CHAT_MEMORY_REF:
@@ -773,7 +818,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
     elif low_cmd == "/status":
         up_str, live_now_str = get_uptime_details()
         reply_msg = (
-            f"👑 Rudra Rocket Status (Boss: @{MAIN_OWNER_ID})\n"
+            f"👑 Divya Rocket Status (Boss: @{MAIN_OWNER_ID})\n"
             f"🕒 Live IST: {live_now_str}\n"
             f"⏳ Uptime: {up_str}\n"
             f"🚀 Started: {BOT_START_TIME_STR}\n"
@@ -783,7 +828,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
 
     elif low_cmd == "/help":
         reply_msg = (
-            "👑 Rudra 50+ Ultimate Commands:\n"
+            "👑 Divya 50+ Ultimate Commands:\n"
             "• /uptime, /ping, /status - Live system info\n"
             "• /afk <reason> & /unafk - Boss AFK responder\n"
             "• /lock & /unlock - Group Night Curfew mode\n"
@@ -791,7 +836,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             "• /readd on/off - Auto re-add left users\n"
             "• /vip @u, /unvip @u, /viplist - VIP control\n"
             "• /setbday DD-MM, /bdaylist - Auto Bday Wisher\n"
-            "• /coins, /daily, /rob @u - Rudra Economy Game\n"
+            "• /coins, /daily, /rob @u - Divya Economy Game\n"
             "• /weather, /meaning, /news, /battle @u1 @u2\n"
             "• /wish, /broadcast, /warn, /forgive, /joke, /quiz\n"
             "• /spam, /nick, /poll, /rank, /tr, /owner, /magic\n"
@@ -850,12 +895,12 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             w_count = USER_WARNINGS[target_u]
             if w_count >= 3:
                 roast_line = generate_gemini_reply(
-                    f"User @{target_u} just crossed 3 warnings! Give them an ultimate, brutal, witty 2-line Hinglish final warning roast!"
+                    f"User @{target_u} just crossed 3 warnings! Give them an ultimate, brutal, witty 2-line Hinglish final warning roast as Divya!"
                 )
                 if roast_line:
                     reply_msg = f"🚨 STRIKE 3/3 (FINAL WARNING) FOR @{target_u}! 🚨\n{roast_line}"
             else:
-                reply_msg = f"⚠️ Warning {w_count}/3 issued to @{target_u}! Sudhar ja warna 3rd strike par Rudra tera band bajayega! 🔥"
+                reply_msg = f"⚠️ Warning {w_count}/3 issued to @{target_u}! Sudhar ja warna 3rd strike par Divya tera band bajayegi! 🔥"
         else:
             reply_msg = "Usage: /warn @username"
 
@@ -893,7 +938,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             BOT_STATUS["last_reply_sent"] = f"Spammed {count}x: {spam_txt}"
             return True
         else:
-            reply_msg = "Usage: /spam 3 Rudra is King 🔥"
+            reply_msg = "Usage: /spam 3 Divya is Queen 🔥"
 
     elif low_cmd.startswith("/nick"):
         parts = cmd_text.split(" ", 2)
@@ -924,6 +969,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             reply_msg = generate_gemini_reply(f"Translate and rewrite this with desi swag: '{tr_input}'. Keep it 1-2 short lines.")
 
     elif low_cmd == "/owner":
+        react_heart_async(cl, tid, mid)
         reply_msg = generate_gemini_reply(
             f"Someone asked about your Owner! Introduce your creator and Boss {OWNER_NAME} (@{MAIN_OWNER_ID}) in a 2-line royal, badass cinematic desi swag style!"
         )
@@ -934,11 +980,11 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
 
     elif low_cmd.startswith("/expose"):
         target = cmd_text[7:].strip() or "is bande"
-        reply_msg = generate_gemini_reply(f"Act like a funny hacker and expose a harmless, hilarious fake secret of {target} in 1-2 Hinglish lines!")
+        reply_msg = generate_gemini_reply(f"Act like a funny hacker Divya and expose a harmless, hilarious fake secret of {target} in 1-2 Hinglish lines!")
 
     elif low_cmd.startswith("/future"):
         target = cmd_text[7:].strip() or "is bande"
-        reply_msg = generate_gemini_reply(f"Predict {target}'s funny future 5 years from now like Baba Rudra in 1-2 roasting Hinglish lines!")
+        reply_msg = generate_gemini_reply(f"Predict {target}'s funny future 5 years from now in 1-2 roasting Hinglish lines!")
 
     elif low_cmd.startswith("/ship"):
         pair = cmd_text[5:].strip() or "do namuno"
@@ -950,6 +996,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
 
     elif low_cmd.startswith("/hype"):
         target = cmd_text[5:].strip() or f"@{MAIN_OWNER_ID}"
+        react_heart_async(cl, tid, mid)
         reply_msg = generate_gemini_reply(f"Hype up and praise {target} in 1-2 royal, badass desi swag lines!")
 
     elif low_cmd.startswith("/target"):
@@ -991,7 +1038,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
     elif low_cmd.startswith("/mood"):
         new_mood = cmd_text[5:].strip() or "savage roaster"
         BOT_PERSONA += f"\nCURRENT MOOD: Strictly talk in '{new_mood}' style."
-        reply_msg = f"⚡ Done Boss! Mera mood ab '{new_mood}' par set ho gaya hai!"
+        reply_msg = f"⚡ Done Boss! Divya ka mood ab '{new_mood}' par set ho gaya hai!"
 
     elif low_cmd.startswith("/say"):
         custom_say = cmd_text[4:].strip()
@@ -1004,7 +1051,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         return True
 
     return False
-            # ==========================================
+# ==========================================
 # 🛡️ NEW PRO ADMIN COMMANDS: AFK, LOCK, GHOSTS, DIRECT KICK & ADD (PART 5)
 # ==========================================
 
@@ -1026,7 +1073,7 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
             f"👑 Boss @{MAIN_OWNER_ID} abhi offline/busy hain.\n"
             f"📝 Reason: {reason}\n"
             f"🕒 Since: {now_str}\n"
-            f"(Koi bhi Boss ko tag karega toh Rudra khud jawab dega!)"
+            f"(Koi bhi Boss ko tag karega toh Divya khud jawab degi!)"
         )
 
     elif low_cmd == "/unafk":
@@ -1042,7 +1089,7 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         reply_msg = (
             f"🔒 GROUP CURFEW / LOCK MODE ON! 🔒\n"
             f"Boss @{MAIN_OWNER_ID} ke aadesh par is group mein shanti (Curfew) laagu kar di gayi hai! "
-            f"Abhi koi faltu message mat karna warna Rudra turant class lagayega! 🤫🔥"
+            f"Abhi koi faltu message mat karna warna Divya turant class lagayegi! 🤫🔥"
         )
 
     elif low_cmd == "/unlock":
@@ -1121,7 +1168,7 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
                 added = add_user_back_to_group(cl, tid, target_uid)
                 if added:
                     welcome_ai = generate_gemini_reply(
-                        f"New member @{target_u} was just added to the group! Give @{target_u} a grand, energetic, witty Hinglish welcome to the group in 1-2 short lines. No owner mention."
+                        f"New member @{target_u} was just added to the group! Give @{target_u} a grand, energetic, friendly Hinglish welcome to the group as Divya in 1-2 short lines. No owner mention."
                     )
                     reply_msg = welcome_ai if welcome_ai else f"✅ Done Boss! @{target_u} ko group mein add kar liya gaya hai! 🎉"
                 else:
@@ -1130,7 +1177,6 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
                 reply_msg = f"❌ Instagram par @{target_u} naam ka user nahi mila!"
 
     if reply_msg:
-        react_heart_async(cl, tid, mid)
         send_reply_fast(cl, tid, mid, reply_msg)
         BOT_STATUS["last_reply_sent"] = reply_msg
         return True
@@ -1160,7 +1206,6 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
             return True
         PUBLIC_CMD_LAST_USED[u_key] = now_t
 
-    react_heart_async(cl, tid, mid)
     reply_msg = None
 
     # 1. Birthday Saver (/setbday DD-MM & /bdaylist)
@@ -1169,7 +1214,8 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
         if re.match(r"^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])$", date_arg):
             USER_BIRTHDAYS[u_key] = date_arg
             save_persistent_memory_async()
-            reply_msg = f"🎂 Done @{sender_uname}! Aapka Birthday ({date_arg}) save ho gaya hai! Us din raat 12 baje Rudra group mein party karwayega! 🥳🔥"
+            react_heart_async(cl, tid, mid)
+            reply_msg = f"🎂 Done @{sender_uname}! Aapka Birthday ({date_arg}) save ho gaya hai! Us din raat 12 baje Divya group mein party karwayegi! 🥳🔥"
         else:
             reply_msg = f"@{sender_uname} Sahi format mein likho dost! Example: /setbday 15-08 (DD-MM)"
 
@@ -1184,7 +1230,7 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
     elif low_cmd.startswith("/coins"):
         target_u = cmd_text[6:].strip().lstrip("@").lower() or u_key
         bal = USER_COINS[target_u]
-        reply_msg = f"💰 @{target_u} ke paas abhi **{bal} Rudra Coins** hain! 🪙🔥"
+        reply_msg = f"💰 @{target_u} ke paas abhi **{bal} Divya Coins** hain! 🪙🔥"
 
     elif low_cmd == "/daily":
         today_date = get_mumbai_time().strftime("%Y-%m-%d")
@@ -1194,7 +1240,8 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
             DAILY_CLAIM_LOG[u_key] = today_date
             USER_COINS[u_key] += DAILY_COINS_REWARD
             save_persistent_memory_async()
-            reply_msg = f"🎁 Mubarak ho @{sender_uname}! Aapko aaj ke **+{DAILY_COINS_REWARD} Rudra Coins** mile hain! Total Balance: {USER_COINS[u_key]} 🪙🔥"
+            react_heart_async(cl, tid, mid)
+            reply_msg = f"🎁 Mubarak ho @{sender_uname}! Aapko aaj ke **+{DAILY_COINS_REWARD} Divya Coins** mile hain! Total Balance: {USER_COINS[u_key]} 🪙🔥"
 
     elif low_cmd.startswith("/rob"):
         victim = cmd_text[4:].strip().lstrip("@").lower()
@@ -1212,7 +1259,7 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
                 USER_COINS[victim] -= stolen
                 USER_COINS[u_key] += stolen
                 save_persistent_memory_async()
-                reply_msg = f"🥷 HEIST SUCCESS! @{sender_uname} ne chupke se @{victim} ke **{stolen} Rudra Coins** chura liye! 💰🔥"
+                reply_msg = f"🥷 HEIST SUCCESS! @{sender_uname} ne chupke se @{victim} ke **{stolen} Coins** chura liye! 💰🔥"
             else:
                 fine = min(75, USER_COINS[u_key])
                 USER_COINS[u_key] -= fine
@@ -1271,7 +1318,7 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
         return True
 
     return False
-    # ==========================================
+        # ==========================================
 # 🚀 ULTRA-FAST OPTIMIZED BOT SETUP + WELCOME & ANTI-LINK FIX (PART 7)
 # ==========================================
 
@@ -1310,9 +1357,9 @@ def login_instagram_bulletproof(cl, raw_session_id):
             res = cl.private_request("accounts/current_user/?edit=true")
             user_data = res.get("user", {})
             bot_user_id = str(user_data.get("pk") or bot_user_id)
-            bot_username = str(user_data.get("username") or bot_username or "rudra_bot")
+            bot_username = str(user_data.get("username") or bot_username or "divya_bot")
         except Exception:
-            bot_username = bot_username or "rudra_bot"
+            bot_username = bot_username or "divya_bot"
 
     return bot_user_id, bot_username
 
@@ -1470,7 +1517,7 @@ def trigger_welcome_new_user(cl, tid, new_uname, bot_own_replies, action_desc=""
         target_tag = f"@{new_uname}" if new_uname and new_uname != "dost" else "naye member"
         prompt = (
             f"A new member {target_tag} just joined/was added to the Instagram group ({action_desc})! "
-            f"Give {target_tag} a super energetic, savage, funny desi Hinglish welcome to the group in 1-2 short lines. Do not mention owner."
+            f"As Divya, give {target_tag} a super energetic, friendly, witty desi Hinglish welcome to the group in 1-2 short lines. Do not mention owner."
         )
         welcome_ai = generate_gemini_reply(prompt)
         if welcome_ai:
@@ -1482,13 +1529,13 @@ def trigger_welcome_new_user(cl, tid, new_uname, bot_own_replies, action_desc=""
     threading.Thread(target=_welcome_worker, daemon=True).start()
 
 def trigger_readd_and_roast(cl, tid, left_uid, left_uname, bot_own_replies, group_members_set=None):
-    """Background thread re-add and roast — Strictly uses Gemini AI!"""
+    """Background thread re-add and roast — Strictly uses Gemini AI as Divya!"""
     def _worker():
         readded = add_user_back_to_group(cl, tid, left_uid)
         if readded and group_members_set is not None:
             group_members_set.add(left_uid)
         ai_left_roast = generate_gemini_reply(
-            f"User @{left_uname} left the group and Rudra immediately added them back! Write a fresh, unique, short 1-line savage Hinglish roast mentioning @{left_uname}. No owner mention."
+            f"User @{left_uname} left the group and Divya immediately added them back! Write a fresh, unique, short 1-line savage Hinglish roast mentioning @{left_uname}. No owner mention."
         )
         if ai_left_roast:
             if f"@{left_uname}" not in ai_left_roast:
@@ -1538,27 +1585,29 @@ def start_instagram_bot():
     except Exception as e:
         BOT_STATUS["last_error"] = f"Init Scan Warning: {e}"
 
-    BOT_STATUS["state"] = "Running 24/7 at 0.5s ROCKET SPEED (100% Pure Gemini AI) 🚀"
+    BOT_STATUS["state"] = "Divya Running 24/7 at 0.5s ROCKET SPEED (100% Pure Gemini AI) 🚀"
     run_main_bot_polling_loop(
         cl, bot_user_id, bot_username, processed_msg_ids,
         recently_readded, recently_welcomed, bot_own_replies, group_members,
         consecutive_errors, loop_counter
-        )
-    # ==========================================
-# 🚀 0.5s PARALLEL MAIN LOOP, WATCHDOG & SERVER (PART 8)
+                )
+                # ==========================================
+# 🚀 0.5s PARALLEL MAIN LOOP, SMART REACTION, WATCHDOG & SERVER (PART 8)
 # ==========================================
 
 def generate_and_send_ai_reply_async(
     cl, tid, mid, sender_uname, text, media_label,
     media_b64, media_mime, time_tag, bot_own_replies
 ):
-    """Generates Gemini reply & sends in parallel background thread so 0.5s polling NEVER slows down!"""
+    """Generates Gemini reply as Divya & sends in parallel background thread + Selective Heart Reaction!"""
     def _ai_worker():
         try:
             recent_context = "\n".join(list(CHAT_MEMORY_REF[tid])[-20:])
             disp_name = USER_NICKNAMES.get(sender_uname.lower(), f"@{sender_uname}")
             tone_instruction = (
-                f"Give an instant, unique, witty, savage Hinglish reply to {disp_name} (@{sender_uname}). "
+                f"You are Divya. If {disp_name} (@{sender_uname}) is talking normally/politely (with or without saying 'Divya'), "
+                f"give a super friendly, sweet, cool, witty Hinglish reply. "
+                f"ONLY if they are angry, rude, roasting, or abusive, unleash your savage Destroyer Mode! "
                 f"DO NOT repeat any phrase or line from the Recent Context."
             )
             prompt = f"Recent Context:\n{recent_context}\n\n@{sender_uname} just said: '{text or media_label}'\n{tone_instruction} Reply in 1 short line."
@@ -1567,11 +1616,14 @@ def generate_and_send_ai_reply_async(
             if ai_reply:
                 final_reply = ai_reply if f"@{sender_uname}" in ai_reply else f"@{sender_uname} {ai_reply}"
                 bot_own_replies.add(final_reply.strip())
-                CHAT_MEMORY_REF[tid].append(f"[{time_tag}] Rudra: {final_reply}")
+                CHAT_MEMORY_REF[tid].append(f"[{time_tag}] Divya: {final_reply}")
                 save_persistent_memory_async()
                 if send_reply_fast(cl, tid, mid, final_reply):
                     BOT_STATUS["last_reply_sent"] = final_reply
-            react_heart_async(cl, tid, mid)
+
+            # SMART HEART REACTION: React ❤️ ONLY if user praised Divya, praised Owner, or said something sweet/positive!
+            if should_react_with_heart(text):
+                react_heart_async(cl, tid, mid)
         except Exception as e:
             BOT_STATUS["last_error"] = f"Async Reply Error: {e}"
 
@@ -1601,7 +1653,7 @@ def run_main_bot_polling_loop(
             up_str, live_now_str = get_uptime_details()
             BOT_STATUS["last_checked"] = live_now_str
             BOT_STATUS["running_uptime"] = up_str
-            BOT_STATUS["state"] = "Running 24/7 at 0.5s ROCKET SPEED (100% Pure Gemini AI) 🚀"
+            BOT_STATUS["state"] = "Divya Running 24/7 at 0.5s ROCKET SPEED (100% Pure Gemini AI) 🚀"
 
             check_and_send_scheduled_wishes(cl, threads, bot_own_replies)
 
@@ -1697,7 +1749,7 @@ def run_main_bot_polling_loop(
                     if tid in LOCKED_THREADS and not is_owner and (sender_uname.lower() not in VIP_USERS):
                         mark_message_seen_async(cl, tid, mid)
                         curfew_reply = generate_gemini_reply(
-                            f"Group is currently locked (Curfew mode). Tell @{sender_uname} in 1 fresh, witty Hinglish line to stay quiet right now. Do not mention owner."
+                            f"Group is currently locked (Curfew mode). As Divya, tell @{sender_uname} in 1 fresh, witty Hinglish line to stay quiet right now. Do not mention owner."
                         )
                         if curfew_reply:
                             bot_own_replies.add(curfew_reply.strip())
@@ -1713,7 +1765,7 @@ def run_main_bot_polling_loop(
                             if LINK_WARNINGS[s_key] < MAX_LINK_WARNINGS:
                                 warn_num = LINK_WARNINGS[s_key]
                                 link_warn_ai = generate_gemini_reply(
-                                    f"User @{sender_uname} sent a link in the group! Give them Warning {warn_num}/3 in 1 short savage Hinglish line telling them links are strictly not allowed. No owner mention."
+                                    f"User @{sender_uname} sent a link in the group! As Divya, give them Warning {warn_num}/3 in 1 short savage Hinglish line telling them links are strictly not allowed. No owner mention."
                                 )
                                 if link_warn_ai:
                                     bot_own_replies.add(link_warn_ai.strip())
@@ -1723,7 +1775,7 @@ def run_main_bot_polling_loop(
                                 kick_user_from_group(cl, tid, sender_id)
                                 LINK_WARNINGS[s_key] = 0
                                 kick_ai = generate_gemini_reply(
-                                    f"User @{sender_uname} was just kicked from the group after 3 link warnings! Announce it in 1 savage Hinglish line. No owner mention."
+                                    f"User @{sender_uname} was just kicked from the group after 3 link warnings! Announce it as Divya in 1 savage Hinglish line. No owner mention."
                                 )
                                 if kick_ai:
                                     bot_own_replies.add(kick_ai.strip())
@@ -1739,7 +1791,7 @@ def run_main_bot_polling_loop(
                             if SPAM_WARNINGS[sp_key] < MAX_SPAM_WARNINGS:
                                 sp_num = SPAM_WARNINGS[sp_key]
                                 spam_warn_ai = generate_gemini_reply(
-                                    f"User @{sender_uname} is spamming messages fast! Give them Spam Warning {sp_num}/3 in 1 short savage Hinglish line. No owner mention."
+                                    f"User @{sender_uname} is spamming messages fast! As Divya, give them Spam Warning {sp_num}/3 in 1 short savage Hinglish line. No owner mention."
                                 )
                                 if spam_warn_ai:
                                     bot_own_replies.add(spam_warn_ai.strip())
@@ -1749,7 +1801,7 @@ def run_main_bot_polling_loop(
                                 kick_user_from_group(cl, tid, sender_id)
                                 SPAM_WARNINGS[sp_key] = 0
                                 spam_kick_ai = generate_gemini_reply(
-                                    f"User @{sender_uname} was just kicked from the group for spamming! Announce it in 1 savage Hinglish line. No owner mention."
+                                    f"User @{sender_uname} was just kicked from the group for spamming! Announce it as Divya in 1 savage Hinglish line. No owner mention."
                                 )
                                 if spam_kick_ai:
                                     bot_own_replies.add(spam_kick_ai.strip())
@@ -1781,18 +1833,19 @@ def run_main_bot_polling_loop(
 
                     if AFK_STATE["is_afk"] and not is_owner and any(k in low_txt for k in [MAIN_OWNER_ID.lower(), OWNER_NAME.lower()]):
                         afk_ai = generate_gemini_reply(
-                            f"@{sender_uname} just mentioned Boss {OWNER_NAME}, who is currently AFK/busy because: '{AFK_STATE['reason']}'. Tell @{sender_uname} in 1 fresh, cool Hinglish line that Boss is busy and to talk to Rudra instead."
+                            f"@{sender_uname} just mentioned Boss {OWNER_NAME}, who is currently AFK/busy because: '{AFK_STATE['reason']}'. As Divya, tell @{sender_uname} in 1 fresh, cool Hinglish line that Boss is busy and to talk to Divya instead."
                         )
                         if afk_ai:
                             bot_own_replies.add(afk_ai.strip())
                             send_reply_fast(cl, tid, mid, afk_ai)
-                        react_heart_async(cl, tid, mid)
+                        if should_react_with_heart(text):
+                            react_heart_async(cl, tid, mid)
                         continue
 
                     asked_about_owner = any(kw in low_txt for kw in ["owner", "creator", "boss", "kisne banaya", "kaun banaya", MAIN_OWNER_ID.lower()])
                     locked_target = TARGETED_USERS.get(tid)
                     
-                    # Replies to ALL messages (whether someone says 'rudra' or NOT!) unless /trigger or /target is active
+                    # Replies to ALL messages (whether someone says 'divya' or NOT!) unless /trigger or /target is active
                     if locked_target:
                         should_reply = (sender_uname.lower() == locked_target) or (TRIGGER_WORD.lower() in low_txt) or asked_about_owner
                     else:
@@ -1840,3 +1893,4 @@ ensure_background_workers_started()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port, threaded=True)
+            
