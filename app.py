@@ -523,13 +523,11 @@ def extract_media_for_gemini(msg):
 def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_tokens_override=None):
     global LOCKED_MODEL, GEMINI_API_KEY
     all_models = [
-        "gemini-3.5-flash-lite",
-        "gemini-2.5-flash-lite",
-        "gemini-2.0-flash-lite",
-        "gemini-2.0-flash",
         "gemini-2.5-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-8b",
+        "gemini-2.5-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite",
+        "gemini-3.5-flash-lite",
         "gemini-3.5-flash"
     ]
     if LOCKED_MODEL:
@@ -537,7 +535,6 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
     else:
         models_to_try = all_models
 
-    headers = {"Content-Type": "application/json"}
     safety_settings = [
         {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
         {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -570,40 +567,58 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
         }
     }
 
-    keys_to_try = GEMINI_KEYS_LIST if "GEMINI_KEYS_LIST" in globals() else [GEMINI_API_KEY]
+    live_env_key = os.getenv("GEMINI_API_KEY", "").strip()
+    keys_to_try = []
+    for k in [FRESH_GEMINI_KEY, live_env_key, OLD_GEMINI_KEY if "OLD_GEMINI_KEY" in globals() else ""]:
+        if k and k not in keys_to_try:
+            keys_to_try.append(k)
+
     for active_key in keys_to_try:
         for model_name in models_to_try:
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={active_key}"
-            try:
-                response = http_session.post(url, headers=headers, data=json.dumps(payload), timeout=4.5)
-                if response.status_code == 200:
-                    result = response.json()
-                    candidates = result.get("candidates", [])
-                    if candidates:
-                        first_cand = candidates[0]
-                        content_obj = first_cand.get("content", {})
-                        parts_arr = content_obj.get("parts", [])
-                        raw_reply = ""
-                        for p in parts_arr:
-                            if "text" in p and not p.get("thought", False):
-                                raw_reply += p.get("text", "")
-                        raw_reply = raw_reply.strip()
-                        if raw_reply:
-                            low_rep = raw_reply.lower()
-                            if any(bad_p in low_rep for bad_p in FORBIDDEN_LEAK_PHRASES):
-                                BOT_STATUS["last_error"] = f"Filtered meta-reply from {model_name}"
-                                continue
-                            LOCKED_MODEL = model_name
-                            GEMINI_API_KEY = active_key
-                            BOT_STATUS["locked_fast_model"] = model_name
-                            BOT_STATUS["last_error"] = "None (Working 100%)"
-                            return raw_reply
-                else:
-                    BOT_STATUS["last_error"] = f"{model_name} ({response.status_code})"
-                    if response.status_code in (400, 401, 403):
-                        break
-            except Exception as e:
-                BOT_STATUS["last_error"] = str(e)
+            # Supports both AI Studio (generativelanguage) AND Vertex Express (aiplatform for AQ. keys!)
+            endpoints = [
+                (
+                    f"https://aiplatform.googleapis.com/v1/publishers/google/models/{model_name}:generateContent?key={active_key}",
+                    {"Content-Type": "application/json"}
+                ),
+                (
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={active_key}",
+                    {"Content-Type": "application/json", "x-goog-api-key": active_key}
+                )
+            ] if active_key.startswith("AQ.") else [
+                (
+                    f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={active_key}",
+                    {"Content-Type": "application/json", "x-goog-api-key": active_key}
+                )
+            ]
+
+            for url, req_headers in endpoints:
+                try:
+                    response = http_session.post(url, headers=req_headers, data=json.dumps(payload), timeout=4.0)
+                    if response.status_code == 200:
+                        result = response.json()
+                        candidates = result.get("candidates", [])
+                        if candidates:
+                            first_cand = candidates[0]
+                            if "content" in first_cand and "parts" in first_cand["content"]:
+                                raw_reply = ""
+                                for p in first_cand["content"]["parts"]:
+                                    if "text" in p and not p.get("thought", False):
+                                        raw_reply += p.get("text", "")
+                                raw_reply = raw_reply.strip()
+                                if raw_reply:
+                                    low_rep = raw_reply.lower()
+                                    if any(bad_p in low_rep for bad_p in FORBIDDEN_LEAK_PHRASES):
+                                        continue
+                                    LOCKED_MODEL = model_name
+                                    GEMINI_API_KEY = active_key
+                                    BOT_STATUS["locked_fast_model"] = model_name
+                                    BOT_STATUS["last_error"] = "None (Working 100%)"
+                                    return raw_reply
+                    else:
+                        BOT_STATUS["last_error"] = f"{model_name} ({response.status_code})"
+                except Exception as e:
+                    BOT_STATUS["last_error"] = str(e)
     return None
 
 def build_Wish_Message(greeting_title, theme_desc, thread_users):
