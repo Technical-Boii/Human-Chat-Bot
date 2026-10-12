@@ -368,8 +368,8 @@ def keep_alive_lightweight():
 def keep_alive_pinger():
     global TOTAL_PINGS_COUNT, LAST_PING_LATENCY_MS
     while True:
-        time.sleep(PING_INTERVAL_
-  try:
+        time.sleep(PING_INTERVAL_SECONDS)
+        try:
             t0 = time.time()
             target_url = f"{RENDER_EXTERNAL_URL.rstrip('/')}/keep-alive"
             resp = http_session.get(target_url, timeout=12)
@@ -378,6 +378,7 @@ def keep_alive_pinger():
             BOT_STATUS["last_self_ping"] = f"{get_mumbai_time().strftime('%I:%M:%S %p IST')} ({LAST_PING_LATENCY_MS}ms | HTTP {resp.status_code})"
         except Exception as e:
             BOT_STATUS["last_self_ping"] = f"Ping Warning: {str(e)}"
+
       # ==========================================
 # ❤️ HEART REACTION, MEDIA/REEL EXTRACTOR, PURE GEMINI AI & WISHER (PART 3)
 # ==========================================
