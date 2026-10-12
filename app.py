@@ -457,7 +457,7 @@ def react_heart_async(cl, thread_id, message_id):
                 pass
     threading.Thread(target=_heart_worker, daemon=True).start()
     def extract_media_for_gemini(msg):
-    if not ENABLE_MULTIMODAL_MEDIA:
+        if not ENABLE_MULTIMODAL_MEDIA:
         return None, None, None
 
     item_type = str(getattr(msg, "item_type", "") or "").lower()
