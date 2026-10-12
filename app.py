@@ -1673,15 +1673,20 @@ def run_main_bot_polling_loop(
                             bot_own_replies.add(text)
                             continue
 
-                    media_b64, media_mime, media_label = extract_media_for_gemini(msg)
-                    if not text and not media_b64: continue
+                                        media_b64, media_mime, media_label = extract_media_for_gemini(msg)
+                    if not text and not media_b64:
+                        continue
 
                     mark_message_seen_async(cl, tid, mid)
-                    if tid in MUTED_THREADS: continue
+                    if tid in MUTED_THREADS:
+                        continue
 
                     MESSAGE_COUNTER[sender_uname] += 1
                     time_tag = get_mumbai_time().strftime("%d %b %I:%M %p")
-                                        CHAT_MEMORY_REF[tid].append(f"[{time_tag}] @{sender_uname}: {text if text else f'[{media_label}]'}")
+                    
+                    # Safe text handling taaki f-string syntax error na aaye
+                    content_str = text if text else f"[{media_label}]"
+                    CHAT_MEMORY_REF[tid].append(f"[{time_tag}] @{sender_uname}: {content_str}")
                     save_persistent_memory_async()
 
                     low_txt = text.lower()
@@ -1719,6 +1724,7 @@ def run_main_bot_polling_loop(
             if consecutive_errors >= 25:
                 return
         time.sleep(CHECK_INTERVAL)
+
 
 
 def immortal_bot_watchdog():
