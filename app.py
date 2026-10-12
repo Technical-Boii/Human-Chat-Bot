@@ -1681,7 +1681,7 @@ def run_main_bot_polling_loop(
 
                     MESSAGE_COUNTER[sender_uname] += 1
                     time_tag = get_mumbai_time().strftime("%d %b %I:%M %p")
-                    CHAT_MEMORY_REF[tid].append(f"[{time_tag}] @{sender_uname}: {text if text else f'[{media_label}]'}")
+                                        CHAT_MEMORY_REF[tid].append(f"[{time_tag}] @{sender_uname}: {text if text else f'[{media_label}]'}")
                     save_persistent_memory_async()
 
                     low_txt = text.lower()
@@ -1696,7 +1696,7 @@ def run_main_bot_polling_loop(
                             react_heart_async(cl, tid, mid)
                         continue
 
-                      asked_about_owner = any(kw in low_txt for kw in ["owner", "creator", "boss", "kisne banaya", "kaun banaya", MAIN_OWNER_ID.lower()] + OWNER_NAMES_LIST)
+                    asked_about_owner = any(kw in low_txt for kw in ["owner", "creator", "boss", "kisne banaya", "kaun banaya", MAIN_OWNER_ID.lower()] + OWNER_NAMES_LIST)
                     locked_target = TARGETED_USERS.get(tid)
                     if locked_target:
                         should_reply = (sender_uname.lower() == locked_target) or (TRIGGER_WORD.lower() in low_txt) or asked_about_owner
@@ -1719,6 +1719,7 @@ def run_main_bot_polling_loop(
             if consecutive_errors >= 25:
                 return
         time.sleep(CHECK_INTERVAL)
+
 
 def immortal_bot_watchdog():
     global BOT_RESTART_COUNT
