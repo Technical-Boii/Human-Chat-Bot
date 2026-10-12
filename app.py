@@ -243,7 +243,6 @@ def contains_link(text):
     return bool(URL_REGEX.search(str(text)))
 
 def message_has_any_link(msg, extracted_text=""):
-    """Deep checks if an Instagram message contains a URL in text, link preview object, or raw payload."""
     if contains_link(extracted_text):
         return True
     item_type = str(getattr(msg, "item_type", "") or "").lower()
@@ -266,8 +265,8 @@ def message_has_any_link(msg, extracted_text=""):
     except Exception:
         pass
     return False
-    def check_is_spamming(tid, user_id):
-    """Tracks message speed per user and returns True if user floods the group."""
+
+def check_is_spamming(tid, user_id):
     if not ENABLE_ANTI_SPAM:
         return False
     now_t = time.time()
@@ -283,9 +282,7 @@ def message_has_any_link(msg, extracted_text=""):
         return True
     return False
 
-
 def kick_user_from_group(cl, thread_id, user_id):
-    """Removes a user from the Instagram group using 3 fallback methods."""
     tid_str = str(thread_id)
     uid_str = str(user_id)
     try:
@@ -313,7 +310,6 @@ def kick_user_from_group(cl, thread_id, user_id):
         return False
 
 def add_user_back_to_group(cl, thread_id, user_id):
-    """Adds a user to the Instagram group using 3 fallback methods!"""
     tid_str = str(thread_id)
     uid_str = str(user_id)
     try:
