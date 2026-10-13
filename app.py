@@ -727,7 +727,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             "• /untarget, /shayari, /td, /summary, /title, /mood, /say\n"
             "• /weather, /meaning, /news"
         )
-            elif low_cmd.startswith("/wish"):
+        elif low_cmd.startswith("/wish"):
         slot = cmd_text[5:].strip().lower()
         t_users = []
         if current_threads:
