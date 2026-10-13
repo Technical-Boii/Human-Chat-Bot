@@ -518,7 +518,7 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
         "gemini-2.0-flash",
         "gemini-2.0-flash-lite",
         "gemini-1.5-flash",
-        "gemini-1.5-flash-8b"
+        "gemini-3.8-flash"
     ]
     if LOCKED_MODEL:
         models_to_try = [LOCKED_MODEL] + [m for m in all_models if m != LOCKED_MODEL]
