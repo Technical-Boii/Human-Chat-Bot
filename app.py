@@ -22,10 +22,10 @@ MAIN_OWNER_ID = "alone.shayar.420"
 OWNER_USERNAMES = ["alone.shayar.420", "infiniteayush", "sonam_v_fulbandhe", "3003parischloe"]
 
 # 2. Gemini API Keys (Auto-Rotation) & Instagram Session ID
-FRESH_GEMINI_KEY = os.getenv("FRESH_GEMINI_KEY", "AQ.Ab8RN6ILzz4srha0weY96O7dgdRlEqIRjDV3FX4WGbR5BGIUbg").strip()
+FRESH_GEMINI_KEY = os.getenv("FRESH_GEMINI_KEY", "AQ.Ab8RN6JJB1J2eGKCM9hb_O41pVzEbdl-w5zRhGxNLtmGU_GIfQ").strip()
 NEW_GEMINI_KEY = FRESH_GEMINI_KEY
-OLD_GEMINI_KEY = "AQ.Ab8RN6ILzz4srha0weY96O7dgdRlEqIRjDV3FX4WGbR5BGIUbg"
-ENV_GEMINI_KEY = os.getenv("GEMINI_API_KEY", "AQ.Ab8RN6ILzz4srha0weY96O7dgdRlEqIRjDV3FX4WGbR5BGIUbg").strip()
+OLD_GEMINI_KEY = "AQ.Ab8RN6JJB1J2eGKCM9hb_O41pVzEbdl-w5zRhGxNLtmGU_GIfQ"
+ENV_GEMINI_KEY = os.getenv("GEMINI_API_KEY", "AQ.Ab8RN6JJB1J2eGKCM9hb_O41pVzEbdl-w5zRhGxNLtmGU_GIfQ").strip()
 
 GEMINI_KEYS_LIST = []
 for k in [FRESH_GEMINI_KEY, NEW_GEMINI_KEY, OLD_GEMINI_KEY, ENV_GEMINI_KEY]:
