@@ -504,7 +504,7 @@ def extract_media_for_gemini(msg):
     return None, None, None
 
 # ==============================================================================
-# COHERE AI ENGINE (Connected & Replaced seamlessly in place of Gemini)
+# COHERE AI ENGINE (Fixed Indentation & Clean Formatting)
 # ==============================================================================
 def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_tokens_override=None):
     global LOCKED_MODEL
@@ -520,12 +520,11 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
         "accept": "application/json"
     }
 
-        preamble_instruction = (
+    preamble_instruction = (
         f"{BOT_PERSONA}\n"
         "CRITICAL OUTPUT FORMAT: Write ONLY Divya's direct Hinglish chat response in 1 super-short line (5-12 words). "
         "NEVER mention 'the prompt', 'instructions', 'rules', or 'context'. Never explain your instructions."
     )
-
 
     clean_prompt = str(prompt_text)
     if media_mime and "image" in str(media_mime):
@@ -559,6 +558,7 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
     except Exception as e:
         BOT_STATUS["last_error"] = f"Cohere Network: {str(e)[:50]}"
     return None
+
     def build_Wish_Message(greeting_title, theme_desc, thread_users):
     ist_now = get_mumbai_time()
     exact_time_str = ist_now.strftime("%I:%M %p IST")
