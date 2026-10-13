@@ -28,7 +28,7 @@ COHERE_KEYS_LIST = [COHERE_API_KEY]
 
 INSTA_SESSION_ID = os.getenv(
     "INSTA_SESSION_ID",
-    "77397600352%3ACdme6cOCmaGcmy%3A25%3AAYmGxLL23liCJhA67rVNV2TiyrUNfruFbcNwW0cDCQ"
+    "77397600352%3A8T0fsp7EmtOVJn%3A15%3AAYmmebqLLaIdcMl4SsaO3XtOZH9QTaXia5zECkwd1Q"
 ).strip()
 INSTAGRAM_SETTINGS_PATH = os.getenv("INSTAGRAM_SETTINGS_PATH", "/var/data/instagrapi_settings.json").strip()
 
