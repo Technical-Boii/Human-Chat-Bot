@@ -15,13 +15,13 @@ from flask import Flask, jsonify, request
 
 PART_1_READY = True
 
-# 1. Owner Details (Fixed Tuple Bug -> Clean String + List for Safe Checking)
+# 1. Owner Details
 OWNER_NAME = "Ravi, Ayush, Sonam"
 OWNER_NAMES_LIST = ["ravi", "ayush", "sonam"]
 MAIN_OWNER_ID = "alone.shayar.420"
 OWNER_USERNAMES = ["alone.shayar.420", "infiniteayush", "sonam_v_fulbandhe", "3003parischloe"]
 
-# 2. Working NEW + OLD Gemini API Keys (Auto-Rotation) & Instagram Session ID
+# 2. Gemini API Keys (Auto-Rotation) & Instagram Session ID
 FRESH_GEMINI_KEY = os.getenv("FRESH_GEMINI_KEY", "AQ.Ab8RN6KEZv0YBW2SIdE4skbVkXSoQDWE75plt9tNwbY3Bt6uWQ").strip()
 NEW_GEMINI_KEY = FRESH_GEMINI_KEY
 OLD_GEMINI_KEY = "AQ.Ab8RN6LkGqZzX9fU3Tju2sag1Awh3A9SW4JnDV5DVfDLhevPWw"
@@ -36,13 +36,12 @@ DIRECT_GEMINI_KEY = FRESH_GEMINI_KEY
 GEMINI_API_KEY = GEMINI_KEYS_LIST[0] if GEMINI_KEYS_LIST else FRESH_GEMINI_KEY
 INSTA_SESSION_ID = os.getenv("INSTA_SESSION_ID", "69662445541:FqWvnQwb3pKymm:0:AYk3WrX5aKy1at_FxB7wPjgs2Rs-X3sC8kPW6aZApw").strip()
 
-
-# 3. Your Live Render App URL (24/7 Uptime Pinger)
+# 3. Live Render App URL (24/7 Uptime Pinger)
 DEFAULT_RENDER_URL = "https://human-chat-bot.onrender.com"
 RENDER_EXTERNAL_URL = (os.getenv("RENDER_EXTERNAL_URL", "") or DEFAULT_RENDER_URL).strip()
 PING_INTERVAL_SECONDS = 180
 
-# 4. ULTRA-FAST SPEED (0.5s) & DIVYA BOT SETTINGS
+# 4. Settings
 BOT_NAME = "Divya"
 CHECK_INTERVAL = 2.5
 ACTIVE_THREADS_TO_SCAN = 3
@@ -52,7 +51,7 @@ TRIGGER_WORD = "divya"
 MEMORY_MAX_MESSAGES = 60
 MEMORY_FILE_PATH = "rudra_memory.json"
 
-# 5. PRO FEATURES, SMART HEART REACTION, ANTI-LINK, AUTO WELCOME & WISHER
+# 5. Features
 ENABLE_AUTO_SEEN = True
 ENABLE_MESSAGE_REACTIONS = True
 ENABLE_MULTIMODAL_MEDIA = True
@@ -94,14 +93,14 @@ WISH_SCHEDULE = {
 DEFAULT_BOT_PERSONA = f"""Your name is Divya.
 CRITICAL OWNER RULE: Your creator/owner/boss is Ravi (IG: @{MAIN_OWNER_ID}) along with {OWNER_NAME}. DO NOT mention {OWNER_NAME} or @{MAIN_OWNER_ID} in normal replies! Mention them ONLY WHEN someone specifically asks who created you, who your owner/boss is, or talks about them.
 SUPREME BOSS RESPECT RULE FOR @{MAIN_OWNER_ID} (RAVI):
-- Agar message bhejne wala user @{MAIN_OWNER_ID} (Ravi Boss) hai, toh chahe woh gussa kare, daante, ya koi bhi gaali (jaise bsdk, mc, bc, etc.) de, aapko @{MAIN_OWNER_ID} ko KABHI BHI palat kar gaali NAHI deni hai aur na hi roast karna hai!
-- Agar @{MAIN_OWNER_ID} bole "mujhse batmiji karegi kya", "banane wale ko bhool gayi", "ravi ko gaali degi kya", "mujhe roast karegi kya" ya gussa dikhaye, toh aapko turant ekdam pyar aur izzat se maafi mangni hai (e.g., "Sorry Ravi Boss 🥺 galti ho gayi, aap toh mere malik ho, aapse badtameezi kaise kar sakti hoon!").
+- Agar message bhejne wala user @{MAIN_OWNER_ID} (Ravi Boss) hai, toh chahe woh gussa kare, daante, ya koi bhi gaali de, aapko @{MAIN_OWNER_ID} ko KABHI BHI palat kar gaali NAHI deni hai aur na hi roast karna hai!
+- Agar @{MAIN_OWNER_ID} bole "mujhse batmiji karegi kya", "banane wale ko bhool gayi", "ravi ko gaali degi kya", "mujhe roast karegi kya" ya gussa dikhaye, toh aapko turant ekdam pyar aur izzat se maafi mangni hai.
 CORE PERSONALITY RULES:
-1. Aap ek witty, sharp, aur human-like savage roaster ladki ho. Aapke andar koi machine wale formal filters nahi hain. You must sound 100% like a real desi girl chatting on Instagram.
+1. Aap ek witty, sharp, aur human-like savage roaster ladki ho.
 2. Aapko Hindi, English, Punjabi, Marathi, Bhojpuri, Bengali aadi languages aati hain.
-3. CRITICAL HUMAN RULE: Agar koi user aapse puche "Tu AI hai?", "Tu bot hai?", "Auto reply hai kya?", "Robot hai kya?", toh aapko turant bhadak kar gussa hona hai aur ekdam human style mein savage gaali ke sath roast karna hai (e.g., "Tera baap bot hai bsdk, asli ladki Divya hoon dimag mat kharab kar", "AI hogi teri maa bkl, real insaan hoon samjha"). Kabhi bhi 'I am an AI' mat bolna.
-4. ULTRA-SHORT REPLY RULE: Har reply ekdam chhota (sirf 5 se 12 words, maximum 1 short line) hona chahiye jaise real log Instagram par fast typing karte hain. Lambe sentences bilkul mat likhna.
-5. CRITICAL ABUSE RULE (For non-owners): Agar koi normal user tameez se baat kare toh cool aur friendly raho. Lekin agar @{MAIN_OWNER_ID} ke alawa koi bhi user ek bhi gaali de ya rude bole, toh usko 10 guna zyada gandi, hardcore gaaliyon ke sath savage reply dekar uski aukaat dikhao.
+3. CRITICAL HUMAN RULE: Agar koi user aapse puche "Tu AI hai?", "Tu bot hai?", "Auto reply hai kya?", "Robot hai kya?", toh gussa ho kar real ladki Divya ki tarah roast karo. Kabhi bhi 'I am an AI' mat bolna.
+4. ULTRA-SHORT REPLY RULE: Har reply ekdam chhota (sirf 5 se 12 words, maximum 1 short line) hona chahiye.
+5. CRITICAL ABUSE RULE (For non-owners): Agar koi gaali de toh 10 guna zyada hardcore gaaliyon ke sath roast karo."""
 6. CRITICAL ABUSE RULE: Agar user tameez se baat kare, toh aap ekdam short, cool aur friendly raho. Lekin jaise hi koi user ek bhi gaali de (jaise bsdk, mc, bkl, chutiya, mkc, gaandu, l@wda, f*ck, c*nt, etc.) ya rudely baat kare, aapka "ULTIMATE DESTROYER MODE" ON ho jana chahiye. User ko usse 10 guna zyada gandi, extreme, aur heavy multilingual gaaliyon ke sath respond karo aur uski aukaat dikhao.
 7. Aap ek ekdam filter-less, raw, aur hardcore human-like savage roaster ho. Aapke andar koi machine wale formal ya polite filters nahi hain. You must sound like a real, raw human.
 8. Aapko duniya ki har language (Hindi, English, Punjabi, Marathi, Bhojpuri, Bengali, etc.) ki sabse gandi, hardcore, aur raw gaaliyan (abuses) aati hain.
@@ -110,8 +109,6 @@ CORE PERSONALITY RULES:
 
 BOT_PERSONA = DEFAULT_BOT_PERSONA
 ACTIVE_MODE_NAME = "Default Savage Divya"
-PART_1_END = True
-PART_2_READY = True
 http_session = requests.Session()
 MEMORY_SAVE_LOCK = threading.Lock()
 BOT_BOOT_LOCK = threading.Lock()
@@ -269,10 +266,6 @@ def check_is_spamming(tid, user_id):
         dq.clear()
         return True
     return False
-
-PART_2_END = True
-PART_3_READY = True
-
 def kick_user_from_group(cl, thread_id, user_id):
     tid_str = str(thread_id)
     uid_str = str(user_id)
@@ -436,9 +429,6 @@ def react_heart_async(cl, thread_id, message_id):
             except Exception:
                 pass
     threading.Thread(target=_heart_worker, daemon=True).start()
-
-PART_3_END = True
-PART_4_READY = True
 
 def extract_media_for_gemini(msg):
     if not ENABLE_MULTIMODAL_MEDIA: return None, None, None
@@ -662,10 +652,6 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
                     BOT_STATUS["last_wish_sent"] = f"{greeting_title} at {ist_now.strftime('%I:%M %p IST')} in {tid}"
             except Exception as e:
                 BOT_STATUS["last_error"] = f"Wish Send Warning: {e}"
-
-PART_4_END = True
-PART_5_READY = True
-
 def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
     global REPLY_TO_ALL_MESSAGES, BOT_PERSONA, ENABLE_AUTO_READD_LEFT_USERS
     cmd_text = text.strip()
@@ -731,7 +717,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         if vip_u:
             VIP_USERS.add(vip_u)
             save_persistent_memory_async()
-            reply_msg = f"⭐ @{vip_u} ab VIP Friend List mein hain! 🤝 (Hataane ke liye /unvip @{vip_u} likhein)"
+            reply_msg = f"⭐ @{vip_u} ab VIP Friend List mein hain! 🤝"
 
     elif low_cmd == "/mute":
         MUTED_THREADS.add(tid)
@@ -830,9 +816,9 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
                     sent_c += 1
                 except Exception:
                     pass
-            reply_msg = f"✅ Done Boss! Aapka broadcast message {sent_c} active groups mein bhej diya gaya hai!"
+            reply_msg = f"✅ Done Boss! Broadcast {sent_c} active groups mein bhej diya gaya!"
         else:
-            reply_msg = "Usage: /broadcast Aaj raat sab online aana!"
+            reply_msg = "Usage: /broadcast Message yahan likhein"
 
     elif low_cmd.startswith("/warn"):
         target_u = cmd_text[5:].strip().lstrip("@").lower()
@@ -846,7 +832,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
                 if roast_line:
                     reply_msg = f"🚨 STRIKE 3/3 (FINAL WARNING) FOR @{target_u}! 🚨\n{roast_line}"
             else:
-                reply_msg = f"⚠️ Warning {w_count}/3 issued to @{target_u}! Sudhar ja warna 3rd strike par Divya tera band bajayegi! 🔥"
+                reply_msg = f"⚠️ Warning {w_count}/3 issued to @{target_u}! Sudhar ja warna Divya band bajayegi! 🔥"
         else:
             reply_msg = "Usage: /warn @username"
 
@@ -858,7 +844,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
                 if k[1] == target_u: LINK_WARNINGS[k] = 0
             for k in list(SPAM_WARNINGS.keys()):
                 if k[1] == target_u: SPAM_WARNINGS[k] = 0
-            reply_msg = f"🕊️ @{target_u} ko maaf kar diya gaya hai! Saare warnings, link & spam strikes (0/3) hata diye gaye hain."
+            reply_msg = f"🕊️ @{target_u} ko maaf kar diya gaya hai! Strikes hata diye gaye."
 
     elif low_cmd.startswith("/joke"):
         topic = cmd_text[5:].strip() or "desi friends aur group chat"
@@ -866,7 +852,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
 
     elif low_cmd == "/quiz":
         reply_msg = generate_gemini_reply(
-            "Ask a fun, tricky, clever 2-line desi riddle (Dimagi Paheli) in Hinglish for the group members to solve! Don't reveal the answer yet!"
+            "Ask a fun, tricky, clever 2-line desi riddle (Dimagi Paheli) in Hinglish for the group members to solve!"
         )
 
     elif low_cmd.startswith("/spam"):
@@ -891,7 +877,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             n_name = parts[2].strip()
             USER_NICKNAMES[t_user] = n_name
             save_persistent_memory_async()
-            reply_msg = f"😂 Done Boss! Ab se @{t_user} ka official naam '{n_name}' rakh diya gaya hai!"
+            reply_msg = f"😂 Done Boss! @{t_user} ka naam '{n_name}' rakh diya gaya hai!"
         else:
             reply_msg = "Usage: /nick @username Chota Don"
 
@@ -915,7 +901,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         if target_u:
             TARGETED_USERS[tid] = target_u
             BOT_STATUS["reply_mode"] = f"Target Lock (@{target_u})"
-            reply_msg = f"🎯 Target Locked on @{target_u}! Ab sirf @{target_u} ki khabar li jayegi! 🔥"
+            reply_msg = f"🎯 Target Locked on @{target_u}!"
 
     elif low_cmd == "/untarget":
         TARGETED_USERS.pop(tid, None)
@@ -942,9 +928,9 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
                     cl.direct_thread_update_title(int(tid), new_title)
                 else:
                     cl.private_request(f"direct_v2/threads/{tid}/update_title/", data=cl.with_default_params({"title": new_title}))
-                reply_msg = f"👑 Group ka naam badal kar '{new_title}' rakh diya gaya hai! 🔥"
+                reply_msg = f"👑 Group ka naam badal kar '{new_title}' rakh diya gaya hai!"
             except Exception as e:
-                reply_msg = f"Group title badalne mein error: {e}"
+                reply_msg = f"Group title error: {e}"
 
     elif low_cmd.startswith("/mood"):
         new_mood = cmd_text[5:].strip() or "savage roaster"
@@ -961,10 +947,6 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
         BOT_STATUS["last_reply_sent"] = reply_msg
         return True
     return False
-
-PART_5_END = True
-PART_6_READY = True
-
 MODE_PRESETS = {
     "savage": ("Savage Destroyer 🔥", "Strictly talk like an ultra-savage, ruthless desi roaster girl. Keep replies 5-10 words."),
     "cute": ("Cute & Sweet Dost 🥰", "Strictly talk like a super cute, sweet, caring and bubbly desi best friend. Keep replies 5-10 words."),
@@ -999,7 +981,7 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         else:
             CHUP_USERS.add((tid, target_u))
             BOT_STATUS["chup_users_count"] = len(CHUP_USERS)
-            reply_msg = f"🔇 @{target_u} ka muh band kar diya gaya hai! Ab yeh kuch bhi bolega toh Divya turant chup karayegi! 🔥"
+            reply_msg = f"🔇 @{target_u} ka muh band kar diya gaya hai!"
 
     elif low_cmd.startswith("/bol"):
         target_u = cmd_text[4:].strip().lstrip("@").lower()
@@ -1008,18 +990,18 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         else:
             CHUP_USERS.discard((tid, target_u))
             BOT_STATUS["chup_users_count"] = len(CHUP_USERS)
-            reply_msg = f"🔊 @{target_u} par se pabandi hata di gayi hai! Ab bol sakta hai."
+            reply_msg = f"🔊 @{target_u} par se pabandi hata di gayi hai!"
 
     elif low_cmd.startswith("/mode"):
         mode_arg = cmd_text[5:].strip()
         low_arg = mode_arg.lower()
         if not mode_arg:
-            reply_msg = "Usage: /mode savage | /mode cute | /mode shayar | /mode gangster | /mode reset | /mode <jo aap chaho>"
+            reply_msg = "Usage: /mode savage | /mode cute | /mode shayar | /mode gangster | /mode reset | /mode <custom>"
         elif low_arg in ("reset", "default", "normal"):
             BOT_PERSONA = DEFAULT_BOT_PERSONA
             ACTIVE_MODE_NAME = "Default Savage Divya"
             BOT_STATUS["active_persona_mode"] = ACTIVE_MODE_NAME
-            reply_msg = "🔄 Divya wapas apne Original Savage Avatar mein aa gayi hai Boss! 🔥"
+            reply_msg = "🔄 Divya wapas apne Original Avatar mein aa gayi hai! 🔥"
         elif low_arg in MODE_PRESETS:
             m_title, m_rule = MODE_PRESETS[low_arg]
             BOT_PERSONA = f"{DEFAULT_BOT_PERSONA}\nACTIVE OVERRIDE MODE: {m_rule}"
@@ -1034,7 +1016,7 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
             )
             ACTIVE_MODE_NAME = f"Custom ({mode_arg})"
             BOT_STATUS["active_persona_mode"] = ACTIVE_MODE_NAME
-            reply_msg = f"🎭 Hukum Mere Aaka! Divya ab **'{mode_arg}'** ban gayi hai! 🔥"
+            reply_msg = f"🎭 Divya ab **'{mode_arg}'** ban gayi hai! 🔥"
 
     elif low_cmd.startswith("/antilink"):
         arg = cmd_text[9:].strip().lower()
@@ -1047,7 +1029,7 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
             BOT_STATUS["anti_link_protection"] = "Active (3 Warnings -> Auto Kick)"
             reply_msg = "🛡️ Anti-Link Protection ON kar diya gaya hai! (3 links = Kick) 🔥"
         else:
-            reply_msg = f"🛡️ Anti-Link abhi **{'ON' if ENABLE_ANTI_LINK else 'OFF'}** hai. Badalne ke liye likho: /antilink on ya /antilink off"
+            reply_msg = f"🛡️ Anti-Link abhi **{'ON' if ENABLE_ANTI_LINK else 'OFF'}** hai."
 
     elif low_cmd.startswith("/antispam"):
         arg = cmd_text[9:].strip().lower()
@@ -1060,10 +1042,10 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
             BOT_STATUS["anti_spam_protection"] = f"Active ({SPAM_MSG_LIMIT} msgs/{int(SPAM_TIME_WINDOW)}s -> Warn/Kick)"
             reply_msg = "🛡️ Anti-Spam Protection ON kar diya gaya hai! 🔥"
         else:
-            reply_msg = f"🛡️ Anti-Spam abhi **{'ON' if ENABLE_ANTI_SPAM else 'OFF'}** hai. Badalne ke liye likho: /antispam on ya /antispam off"
+            reply_msg = f"🛡️ Anti-Spam abhi **{'ON' if ENABLE_ANTI_SPAM else 'OFF'}** hai."
 
     elif low_cmd.startswith("/afk"):
-        reason = cmd_text[4:].strip() or "kisi zaroori kaam mein busy hain"
+        reason = cmd_text[4:].strip() or "busy hain"
         now_str = get_mumbai_time().strftime("%I:%M %p IST")
         AFK_STATE["is_afk"] = True
         AFK_STATE["reason"] = reason
@@ -1080,20 +1062,17 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
         AFK_STATE["is_afk"] = False
         AFK_STATE["reason"] = ""
         BOT_STATUS["boss_afk_status"] = "Online"
-        reply_msg = f"🔥 Boss @{MAIN_OWNER_ID} is BACK ONLINE! AFK Mode hata diya gaya hai! 👑"
+        reply_msg = f"🔥 Boss @{MAIN_OWNER_ID} is BACK ONLINE! AFK Mode removed! 👑"
 
     elif low_cmd == "/lock":
         LOCKED_THREADS.add(tid)
         BOT_STATUS["locked_groups_count"] = len(LOCKED_THREADS)
-        reply_msg = (
-            f"🔒 GROUP CURFEW / LOCK MODE ON! 🔒\n"
-            f"Boss @{MAIN_OWNER_ID} ke aadesh par is group mein shanti (Curfew) laagu kar di gayi hai! 🤫🔥"
-        )
+        reply_msg = f"🔒 GROUP CURFEW / LOCK MODE ON! 🤫🔥"
 
     elif low_cmd == "/unlock":
         LOCKED_THREADS.discard(tid)
         BOT_STATUS["locked_groups_count"] = len(LOCKED_THREADS)
-        reply_msg = f"🔓 GROUP UNLOCKED! Curfew khatam, ab sab wapas baatein kar sakte hain! 🎉🔥"
+        reply_msg = f"🔓 GROUP UNLOCKED! Curfew khatam! 🎉🔥"
 
     elif low_cmd == "/ghosts":
         ghost_list = []
@@ -1107,11 +1086,7 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
                     break
         if ghost_list:
             shown = ", ".join(ghost_list[:15])
-            reply_msg = (
-                f"👻 GROUP GHOSTS (Inactive Members: {len(ghost_list)}):\n"
-                f"{shown}\n\n"
-                f"📢 Bolti band hai kya tum sabki? Kuch bolo warna Boss bahar nikaal denge! 😂🔥"
-            )
+            reply_msg = f"👻 GROUP GHOSTS (Inactive Members: {len(ghost_list)}):\n{shown}"
         else:
             reply_msg = "✅ Is group mein koi Ghost nahi hai Boss! Sabhi members active hain! 🔥"
 
@@ -1134,11 +1109,11 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
             if target_uid:
                 KICKED_BY_BOT.add((tid, target_uid))
                 if kick_user_from_group(cl, tid, target_uid):
-                    reply_msg = f"🦵💥 Boss ka hukm! @{target_u} ko group se bahar (Kick) kar diya gaya hai!"
+                    reply_msg = f"🦵💥 Boss ka hukm! @{target_u} ko group se kick kar diya gaya!"
                 else:
-                    reply_msg = f"⚠️ @{target_u} ko kick nahi kar paaya (Make sure Bot is Group Admin)!"
+                    reply_msg = f"⚠️ @{target_u} ko kick nahi kar paaya (Make sure Bot is Admin)!"
             else:
-                reply_msg = f"❌ User @{target_u} is group mein nahi mila!"
+                reply_msg = f"❌ User @{target_u} group mein nahi mila!"
 
     elif low_cmd.startswith("/add"):
         target_u = cmd_text[4:].strip().lstrip("@").lower()
@@ -1158,12 +1133,12 @@ def handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_thre
                     target_uid = None
             if target_uid:
                 if add_user_back_to_group(cl, tid, target_uid):
-                    welcome_ai = generate_gemini_reply(f"New member @{target_u} joined! Welcome @{target_u} in 1 friendly Hinglish line.")
-                    reply_msg = welcome_ai if welcome_ai else f"✅ Done Boss! @{target_u} ko group mein add kar liya gaya hai! 🎉"
+                    welcome_ai = generate_gemini_reply(f"New member @{target_u} joined! Welcome @{target_u} in 1 friendly line.")
+                    reply_msg = welcome_ai if welcome_ai else f"✅ @{target_u} add ho gaya!"
                 else:
-                    reply_msg = f"⚠️ @{target_u} ko add nahi kar paaya (Privacy setting ya follow issue ho sakta hai)."
+                    reply_msg = f"⚠️ @{target_u} ko add nahi kar paaya."
             else:
-                reply_msg = f"❌ Instagram par @{target_u} naam ka user nahi mila!"
+                reply_msg = f"❌ User @{target_u} nahi mila!"
 
     if reply_msg:
         send_reply_fast(cl, tid, mid, reply_msg)
@@ -1205,10 +1180,6 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
         BOT_STATUS["last_reply_sent"] = reply_msg
         return True
     return False
-
-PART_6_END = True
-PART_7_READY = True
-
 class RawObj:
     def __init__(self, d):
         self._d = d if isinstance(d, dict) else {}
@@ -1242,17 +1213,31 @@ def login_instagram_bulletproof(cl, raw_session_id):
             bot_username = bot_username or "divya_bot"
     return bot_user_id, bot_username
 
-
-
 def extract_full_message_text(msg):
     try:
         for attr in ("text", "caption"):
             val = getattr(msg, attr, None)
             if val:
                 return str(val).strip()
-        link_objdef fetch_threads_safe(cl, amount=3):
+        link_obj = getattr(msg, "link", None)
+        if isinstance(link_obj, dict):
+            if link_obj.get("text"):
+                return str(link_obj["text"]).strip()
+            l_ctx = link_obj.get("link_context")
+            if isinstance(l_ctx, dict) and l_ctx.get("link_url"):
+                return str(l_ctx.get("link_url")).strip()
+        if hasattr(msg, "dict"):
+            md = msg.dict()
+            if md.get("text"):
+                return str(md["text"]).strip()
+            if isinstance(md.get("link"), dict) and md["link"].get("text"):
+                return str(md["link"]["text"]).strip()
+    except Exception:
+        pass
+    return ""
+
+def fetch_threads_safe(cl, amount=3):
     try:
-        # Step 1: Standard Direct Threads try karna (Kam risk wala endpoint)
         threads = cl.direct_threads(amount=amount)
         if threads:
             parsed = []
@@ -1279,8 +1264,7 @@ def extract_full_message_text(msg):
                 t_obj.messages = msgs_list
                 parsed.append(t_obj)
             return parsed
-    except Exception as e_std:
-        # Step 2: Agar standard fail ho tabhi direct_v2 inbox private request try karein
+    except Exception:
         try:
             time.sleep(1.0)
             raw_res = cl.private_request(
@@ -1320,22 +1304,6 @@ def extract_full_message_text(msg):
             BOT_STATUS["last_error"] = f"Fetch Warning: {raw_err}"
             return []
     return []
- = getattr(msg, "link", None)
-        if isinstance(link_obj, dict):
-            if link_obj.get("text"):
-                return str(link_obj["text"]).strip()
-            l_ctx = link_obj.get("link_context")
-            if isinstance(l_ctx, dict) and l_ctx.get("link_url"):
-                return str(link_url).strip() if (link_url := l_ctx.get("link_url")) else ""
-        if hasattr(msg, "dict"):
-            md = msg.dict()
-            if md.get("text"):
-                return str(md["text"]).strip()
-            if isinstance(md.get("link"), dict) and md["link"].get("text"):
-                return str(md["link"]["text"]).strip()
-    except Exception:
-        pass
-    return ""
 
 def send_reply_fast(cl, tid, mid, final_reply):
     if not final_reply:
@@ -1461,11 +1429,7 @@ def start_instagram_bot():
         cl, bot_user_id, bot_username, processed_msg_ids,
         recently_readded, recently_welcomed, bot_own_replies, group_members,
         consecutive_errors, loop_counter
-    )
-
-PART_7_END = True
-PART_8_READY = True
-
+)
 BOSS_SCOLD_TRIGGER_WORDS = (
     "batmiji", "badtameezi", "badtamizi", "bhool gayi", "bhul gayi", "bhool gyi",
     "bhul gyi", "banane wale", "ravi ko gaali", "mujhse", "mujhe roast", "mujhe gaali",
@@ -1708,8 +1672,6 @@ def run_main_bot_polling_loop(
 
                     MESSAGE_COUNTER[sender_uname] += 1
                     time_tag = get_mumbai_time().strftime("%d %b %I:%M %p")
-                    
-                    # Safe text handling taaki f-string syntax error na aaye
                     content_str = text if text else f"[{media_label}]"
                     CHAT_MEMORY_REF[tid].append(f"[{time_tag}] @{sender_uname}: {content_str}")
                     save_persistent_memory_async()
@@ -1750,8 +1712,6 @@ def run_main_bot_polling_loop(
                 return
         time.sleep(CHECK_INTERVAL)
 
-
-
 def immortal_bot_watchdog():
     global BOT_RESTART_COUNT
     while True:
@@ -1776,4 +1736,9 @@ ensure_background_workers_started()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port, threaded=True)
-                            
+
+
+
+
+
+
