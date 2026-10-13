@@ -551,9 +551,10 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
     except Exception as e:
         BOT_STATUS["last_error"] = f"Cohere Network: {str(e)[:50]}"
     return None
-                        # ==============================================================================
-# SCHEDULED WISH FUNCTIONS (Top-Level Clean Functions)
+ # ==============================================================================
+# PART 5: SCHEDULED WISH FUNCTIONS & OWNER COMMANDS (SYNTAX FIXED)
 # ==============================================================================
+
 def build_Wish_Message(greeting_title, theme_desc, thread_users):
     ist_now = get_mumbai_time()
     exact_time_str = ist_now.strftime("%I:%M %p IST")
