@@ -556,11 +556,13 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
     global REPLY_TO_ALL_MESSAGES, BOT_PERSONA, ENABLE_AUTO_READD_LEFT_USERS
     cmd_text = text.strip()
     low_cmd = cmd_text.lower()
-    if not low_cmd.startswith("/"): return False
-    if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads): return True
+    if not low_cmd.startswith("/"):
+        return False
+    if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads):
+        return True
     reply_msg = None
 
-        if low_cmd == "/uptime":
+    if low_cmd == "/uptime":
         up_str, live_now_str = get_uptime_details()
         mem_count = len(CHAT_MEMORY_REF.get(tid, []))
         reply_msg = (
@@ -574,6 +576,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             f"🎭 Mode: {ACTIVE_MODE_NAME}\n"
             f"🛡️ Anti-Link: {'ON' if ENABLE_ANTI_LINK else 'OFF'} | Anti-Spam: {'ON' if ENABLE_ANTI_SPAM else 'OFF'}"
         )
+
 
                                    
 # ==============================================================================
