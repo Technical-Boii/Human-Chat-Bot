@@ -730,7 +730,25 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
             "• /untarget, /shayari, /td, /summary, /title, /mood, /say\n"
             "• /weather, /meaning, /news"
             )
-                elif low_cmd.startswith("/wish"):
+                    elif low_cmd == "/help":
+        reply_msg = (
+            "👑 Divya Ultimate Admin Commands:\n"
+            "• /tagall <msg> - Tag all group members\n"
+            "• /chup @u & /bol @u - Mute/Unmute specific user\n"
+            "• /mode <savage/cute/shayar/gangster/reset/any>\n"
+            "• /antilink on/off & /antispam on/off\n"
+            "• /uptime, /ping, /status, /clear\n"
+            "• /afk <reason> & /unafk - Boss AFK responder\n"
+            "• /lock & /unlock - Group Curfew mode\n"
+            "• /kick @u, /add @u, /ghosts, /readd on/off\n"
+            "• /vip @u, /unvip @u, /viplist\n"
+            "• /wish, /broadcast, /warn, /forgive, /joke, /quiz\n"
+            "• /spam, /nick, /owner, /roast, /hype, /target\n"
+            "• /untarget, /shayari, /td, /summary, /title, /mood, /say\n"
+            "• /weather, /meaning, /news"
+        )
+
+    elif low_cmd.startswith("/wish"):
         slot = cmd_text[5:].strip().lower()
         t_users = []
         if current_threads:
