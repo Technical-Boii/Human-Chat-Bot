@@ -357,7 +357,7 @@ def keep_alive_pinger():
             BOT_STATUS["last_self_ping"] = f"{get_mumbai_time().strftime('%I:%M:%S %p IST')} ({LAST_PING_LATENCY_MS}ms | HTTP {resp.status_code})"
         except Exception as e:
             BOT_STATUS["last_self_ping"] = f"Ping Warning: {str(e)}"
-            FORBIDDEN_LEAK_PHRASES = (
+    FORBIDDEN_LEAK_PHRASES = (
     "the prompt",
     "contains instructions",
     "prompt contains",
@@ -551,36 +551,8 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
     except Exception as e:
         BOT_STATUS["last_error"] = f"Cohere Network: {str(e)[:50]}"
     return None
-                    
-def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
-    global REPLY_TO_ALL_MESSAGES, BOT_PERSONA, ENABLE_AUTO_READD_LEFT_USERS
-    cmd_text = text.strip()
-    low_cmd = cmd_text.lower()
-    if not low_cmd.startswith("/"):
-        return False
-    if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads):
-        return True
-    reply_msg = None
-
-    if low_cmd == "/uptime":
-        up_str, live_now_str = get_uptime_details()
-        mem_count = len(CHAT_MEMORY_REF.get(tid, []))
-        reply_msg = (
-            f"⏱️ DIVYA LIVE UPTIME & SYSTEM DATA ⏱️\n"
-            f"🟢 Status: Running 24/7 Non-Stop (0.5s Speed)\n"
-            f"🚀 Started / Restarted: {BOT_START_TIME_STR}\n"
-            f"⏳ Total Running Time: {up_str}\n"
-            f"📅 Live Date & Time: {live_now_str}\n"
-            f"📡 Self-Pings Done: {TOTAL_PINGS_COUNT} ({LAST_PING_LATENCY_MS} ms)\n"
-            f"🧠 Group Memory Saved: {mem_count}/{MEMORY_MAX_MESSAGES} msgs\n"
-            f"🎭 Mode: {ACTIVE_MODE_NAME}\n"
-            f"🛡️ Anti-Link: {'ON' if ENABLE_ANTI_LINK else 'OFF'} | Anti-Spam: {'ON' if ENABLE_ANTI_SPAM else 'OFF'}"
-        )
-
-
-                                   
-# ==============================================================================
-# SCHEDULED WISH FUNCTIONS (Top-Level 0-Space Indent)
+                        # ==============================================================================
+# SCHEDULED WISH FUNCTIONS (Top-Level Clean Functions)
 # ==============================================================================
 def build_Wish_Message(greeting_title, theme_desc, thread_users):
     ist_now = get_mumbai_time()
@@ -628,6 +600,31 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
                     BOT_STATUS["last_wish_sent"] = f"{greeting_title} at {ist_now.strftime('%I:%M %p IST')} in {tid}"
             except Exception as e:
                 BOT_STATUS["last_error"] = f"Wish Send Warning: {e}"
+
+def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
+    global REPLY_TO_ALL_MESSAGES, BOT_PERSONA, ENABLE_AUTO_READD_LEFT_USERS
+    cmd_text = text.strip()
+    low_cmd = cmd_text.lower()
+    if not low_cmd.startswith("/"):
+        return False
+    if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads):
+        return True
+    reply_msg = None
+
+    if low_cmd == "/uptime":
+        up_str, live_now_str = get_uptime_details()
+        mem_count = len(CHAT_MEMORY_REF.get(tid, []))
+        reply_msg = (
+            f"⏱️ DIVYA LIVE UPTIME & SYSTEM DATA ⏱️\n"
+            f"🟢 Status: Running 24/7 Non-Stop (0.5s Speed)\n"
+            f"🚀 Started / Restarted: {BOT_START_TIME_STR}\n"
+            f"⏳ Total Running Time: {up_str}\n"
+            f"📅 Live Date & Time: {live_now_str}\n"
+            f"📡 Self-Pings Done: {TOTAL_PINGS_COUNT} ({LAST_PING_LATENCY_MS} ms)\n"
+            f"🧠 Group Memory Saved: {mem_count}/{MEMORY_MAX_MESSAGES} msgs\n"
+            f"🎭 Mode: {ACTIVE_MODE_NAME}\n"
+            f"🛡️ Anti-Link: {'ON' if ENABLE_ANTI_LINK else 'OFF'} | Anti-Spam: {'ON' if ENABLE_ANTI_SPAM else 'OFF'}"
+        )
 
     elif low_cmd == "/ping":
         t0 = time.time()
@@ -729,26 +726,8 @@ def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
             "• /spam, /nick, /owner, /roast, /hype, /target\n"
             "• /untarget, /shayari, /td, /summary, /title, /mood, /say\n"
             "• /weather, /meaning, /news"
-            )
-                    elif low_cmd == "/help":
-        reply_msg = (
-            "👑 Divya Ultimate Admin Commands:\n"
-            "• /tagall <msg> - Tag all group members\n"
-            "• /chup @u & /bol @u - Mute/Unmute specific user\n"
-            "• /mode <savage/cute/shayar/gangster/reset/any>\n"
-            "• /antilink on/off & /antispam on/off\n"
-            "• /uptime, /ping, /status, /clear\n"
-            "• /afk <reason> & /unafk - Boss AFK responder\n"
-            "• /lock & /unlock - Group Curfew mode\n"
-            "• /kick @u, /add @u, /ghosts, /readd on/off\n"
-            "• /vip @u, /unvip @u, /viplist\n"
-            "• /wish, /broadcast, /warn, /forgive, /joke, /quiz\n"
-            "• /spam, /nick, /owner, /roast, /hype, /target\n"
-            "• /untarget, /shayari, /td, /summary, /title, /mood, /say\n"
-            "• /weather, /meaning, /news"
         )
-
-    elif low_cmd.startswith("/wish"):
+            elif low_cmd.startswith("/wish"):
         slot = cmd_text[5:].strip().lower()
         t_users = []
         if current_threads:
@@ -1152,7 +1131,7 @@ def handle_public_user_command(cl, tid, mid, text, sender_uname, is_owner=False)
         BOT_STATUS["last_reply_sent"] = reply_msg
         return True
     return False
-class RawObj:
+            class RawObj:
     def __init__(self, d):
         self._d = d if isinstance(d, dict) else {}
         for k, v in self._d.items():
@@ -1362,20 +1341,7 @@ def trigger_readd_and_roast(cl, tid, left_uid, left_uname, bot_own_replies, grou
             send_reply_fast(cl, tid, None, ai_left_roast)
     threading.Thread(target=_worker, daemon=True).start()
 
-
-    BOSS_SCOLD_TRIGGER_WORDS = (
-    "batmiji", "badtameezi", "badtamizi", "bhool gayi", "bhul gayi", "bhool gyi",
-    "bhul gyi", "banane wale", "ravi ko gaali", "mujhse", "mujhe roast", "mujhe gaali",
-    "apne malik", "apne boss", "aukaat", "tameez"
-)
-
-def generate_and_send_ai_reply_async(
-    cl, tid, mid, sender_uname, text, media_label,
-    media_b64, media_mime, time_tag, bot_own_replies
-):
-    def _ai_worker():
-        try:
-    def start_instagram_bot():
+def start_instagram_bot():
     if not INSTA_SESSION_ID:
         BOT_STATUS["state"] = "Error: INSTA_SESSION_ID is empty!"
         time.sleep(30)
@@ -1415,8 +1381,20 @@ def generate_and_send_ai_reply_async(
         cl, bot_user_id, bot_username, processed_msg_ids,
         recently_readded, recently_welcomed, bot_own_replies, group_members,
         consecutive_errors, loop_counter
-    )
-        recent_context = "\n".join(list(CHAT_MEMORY_REF[tid])[-12:])
+)
+            BOSS_SCOLD_TRIGGER_WORDS = (
+    "batmiji", "badtameezi", "badtamizi", "bhool gayi", "bhul gayi", "bhool gyi",
+    "bhul gyi", "banane wale", "ravi ko gaali", "mujhse", "mujhe roast", "mujhe gaali",
+    "apne malik", "apne boss", "aukaat", "tameez"
+)
+
+def generate_and_send_ai_reply_async(
+    cl, tid, mid, sender_uname, text, media_label,
+    media_b64, media_mime, time_tag, bot_own_replies
+):
+    def _ai_worker():
+        try:
+            recent_context = "\n".join(list(CHAT_MEMORY_REF[tid])[-12:])
             disp_name = USER_NICKNAMES.get(sender_uname.lower(), f"@{sender_uname}")
             low_txt = (text or "").lower()
             is_main_boss = (sender_uname.lower() == MAIN_OWNER_ID.lower())
@@ -1710,3 +1688,4 @@ ensure_background_workers_started()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port, threaded=True)
+            
