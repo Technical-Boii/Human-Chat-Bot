@@ -551,49 +551,7 @@ def generate_gemini_reply(prompt_text, media_b64=None, media_mime=None, max_toke
     except Exception as e:
         BOT_STATUS["last_error"] = f"Cohere Network: {str(e)[:50]}"
     return None
-                    def build_Wish_Message(greeting_title, theme_desc, thread_users):
-    ist_now = get_mumbai_time()
-    exact_time_str = ist_now.strftime("%I:%M %p IST")
-    date_str = ist_now.strftime("%d %b %Y")
-    shayari_prompt = (
-        f"Write a fresh, unique, awesome 2-line Hindi/Urdu shayari in Hinglish for '{greeting_title}' "
-        f"based on the theme: '{theme_desc}'. Do NOT mention any owner name. Just give the 2-line shayari."
-    )
-    shayari_text = generate_gemini_reply(shayari_prompt, max_tokens_override=120)
-    if not shayari_text: return None
-    member_tags = " ".join([f"@{u.username}" for u in thread_users[:6] if getattr(u, "username", None)])
-    tag_line = f"@everyone {member_tags}".strip()
-    final_wish = (
-        f"🌟 {greeting_title} 🌟\n"
-        f"🕒 Mumbai Time: {exact_time_str} ({date_str})\n\n"
-        f"✨ {shayari_text}\n\n"
-        f"📢 {tag_line}"
-    )
-    return final_wish
-
-def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
-    if not ENABLE_AUTO_WISHER: return
-    ist_now = get_mumbai_time()
-    current_hour = ist_now.hour
-    current_minute = ist_now.minute
-    today_str = ist_now.strftime("%Y-%m-%d")
-    if current_hour in WISH_SCHEDULE and current_minute <= 10:
-        greeting_title, theme_desc = WISH_SCHEDULE[current_hour]
-        for thread in threads:
-            tid = str(thread.id)
-            if tid in MUTED_THREADS: continue
-            wish_key = (today_str, current_hour, tid)
-            if wish_key in SENT_WISHES_LOG: continue
-            try:
-                wish_msg = build_Wish_Message(greeting_title, theme_desc, thread.users)
-                if wish_msg:
-                    SENT_WISHES_LOG.add(wish_key)
-                    bot_own_replies.add(wish_msg.strip())
-                    send_reply_fast(cl, tid, None, wish_msg)
-                    BOT_STATUS["last_wish_sent"] = f"{greeting_title} at {ist_now.strftime('%I:%M %p IST')} in {tid}"
-            except Exception as e:
-                BOT_STATUS["last_error"] = f"Wish Send Warning: {e}"
-
+                    
 def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None):
     global REPLY_TO_ALL_MESSAGES, BOT_PERSONA, ENABLE_AUTO_READD_LEFT_USERS
     cmd_text = text.strip()
@@ -602,7 +560,7 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
     if handle_new_admin_commands(cl, tid, mid, cmd_text, sender_uname, current_threads): return True
     reply_msg = None
 
-    if low_cmd == "/uptime":
+        if low_cmd == "/uptime":
         up_str, live_now_str = get_uptime_details()
         mem_count = len(CHAT_MEMORY_REF.get(tid, []))
         reply_msg = (
@@ -616,6 +574,57 @@ def handle_owner_command(cl, tid, mid, text, sender_uname, current_threads=None)
             f"🎭 Mode: {ACTIVE_MODE_NAME}\n"
             f"🛡️ Anti-Link: {'ON' if ENABLE_ANTI_LINK else 'OFF'} | Anti-Spam: {'ON' if ENABLE_ANTI_SPAM else 'OFF'}"
         )
+
+                                   
+# ==============================================================================
+# SCHEDULED WISH FUNCTIONS (Top-Level 0-Space Indent)
+# ==============================================================================
+def build_Wish_Message(greeting_title, theme_desc, thread_users):
+    ist_now = get_mumbai_time()
+    exact_time_str = ist_now.strftime("%I:%M %p IST")
+    date_str = ist_now.strftime("%d %b %Y")
+    shayari_prompt = (
+        f"Write a fresh, unique, awesome 2-line Hindi/Urdu shayari in Hinglish for '{greeting_title}' "
+        f"based on the theme: '{theme_desc}'. Do NOT mention any owner name. Just give the 2-line shayari."
+    )
+    shayari_text = generate_gemini_reply(shayari_prompt, max_tokens_override=120)
+    if not shayari_text:
+        return None
+    member_tags = " ".join([f"@{u.username}" for u in thread_users[:6] if getattr(u, "username", None)])
+    tag_line = f"@everyone {member_tags}".strip()
+    final_wish = (
+        f"🌟 {greeting_title} 🌟\n"
+        f"🕒 Mumbai Time: {exact_time_str} ({date_str})\n\n"
+        f"✨ {shayari_text}\n\n"
+        f"📢 {tag_line}"
+    )
+    return final_wish
+
+def check_and_send_scheduled_wishes(cl, threads, bot_own_replies):
+    if not ENABLE_AUTO_WISHER:
+        return
+    ist_now = get_mumbai_time()
+    current_hour = ist_now.hour
+    current_minute = ist_now.minute
+    today_str = ist_now.strftime("%Y-%m-%d")
+    if current_hour in WISH_SCHEDULE and current_minute <= 10:
+        greeting_title, theme_desc = WISH_SCHEDULE[current_hour]
+        for thread in threads:
+            tid = str(thread.id)
+            if tid in MUTED_THREADS:
+                continue
+            wish_key = (today_str, current_hour, tid)
+            if wish_key in SENT_WISHES_LOG:
+                continue
+            try:
+                wish_msg = build_Wish_Message(greeting_title, theme_desc, thread.users)
+                if wish_msg:
+                    SENT_WISHES_LOG.add(wish_key)
+                    bot_own_replies.add(wish_msg.strip())
+                    send_reply_fast(cl, tid, None, wish_msg)
+                    BOT_STATUS["last_wish_sent"] = f"{greeting_title} at {ist_now.strftime('%I:%M %p IST')} in {tid}"
+            except Exception as e:
+                BOT_STATUS["last_error"] = f"Wish Send Warning: {e}"
 
     elif low_cmd == "/ping":
         t0 = time.time()
